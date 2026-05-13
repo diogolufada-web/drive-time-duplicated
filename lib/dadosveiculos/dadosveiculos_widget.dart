@@ -25,6 +25,11 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
+  /// Path of the `veiculos` document whose fields were seeded into the
+  /// text controllers. Seeding runs at most once per path so later stream
+  /// rebuilds do not overwrite user edits.
+  String? _vehicleControllersSeededForPath;
+
   @override
   void initState() {
     super.initState();
@@ -82,21 +87,29 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
             ? dadosveiculosVeiculosRecordList.first
             : null;
 
-        _model.textController1 ??= TextEditingController(
-          text: vehicleRecord?.matricula ?? '',
-        );
-        _model.textController2 ??= TextEditingController(
-          text: vehicleRecord?.marca ?? '',
-        );
-        _model.textController3 ??= TextEditingController(
-          text: vehicleRecord?.ano ?? '',
-        );
-        _model.textController4 ??= TextEditingController(
-          text: vehicleRecord?.cor ?? '',
-        );
-        _model.textController5 ??= TextEditingController(
-          text: vehicleRecord?.licencaoperador ?? '',
-        );
+        if (vehicleRecord != null) {
+          final docPath = vehicleRecord.reference.path;
+          if (_vehicleControllersSeededForPath != docPath) {
+            _model.textController1 ??= TextEditingController();
+            _model.textController2 ??= TextEditingController();
+            _model.textController3 ??= TextEditingController();
+            _model.textController4 ??= TextEditingController();
+            _model.textController5 ??= TextEditingController();
+            _model.textController1!.text = vehicleRecord.matricula;
+            _model.textController2!.text = vehicleRecord.marca;
+            _model.textController3!.text = vehicleRecord.ano;
+            _model.textController4!.text = vehicleRecord.cor;
+            _model.textController5!.text = vehicleRecord.licencaoperador;
+            _vehicleControllersSeededForPath = docPath;
+          }
+        } else {
+          _vehicleControllersSeededForPath = null;
+          _model.textController1 ??= TextEditingController();
+          _model.textController2 ??= TextEditingController();
+          _model.textController3 ??= TextEditingController();
+          _model.textController4 ??= TextEditingController();
+          _model.textController5 ??= TextEditingController();
+        }
 
         return _buildVehicleForm(context, vehicleRecord);
       },
