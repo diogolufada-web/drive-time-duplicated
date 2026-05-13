@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "481957119633",
+    "firebase_url": "https://drive-time-da85f-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "drive-time-da85f",
+    "storage_bucket": "drive-time-da85f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:481957119633:android:5cc4f6d0f06a52ab5ea130",
+        "android_client_info": {
+          "package_name": "com.mycompany.drivetime"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "481957119633-rrlid37qj3ihccos3lvve6t86nco6auv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mycompany.drivetime",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "481957119633-0d1sm5sf1qijjav28567kec81vkhu21e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDK_TyLOc7F3QA4guhVOyXN7P1fmcxKjsE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "481957119633-0d1sm5sf1qijjav28567kec81vkhu21e.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "481957119633-3g353j8ug2e8hv9oj01oi2hvshqdj7n0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mycompany.drivetime"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
