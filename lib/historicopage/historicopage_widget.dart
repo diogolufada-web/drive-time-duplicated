@@ -66,8 +66,8 @@ class _HistoricopageWidgetState extends State<HistoricopageWidget> {
                                   borderRadius: BorderRadius.circular(8.0),
                                   child: Image.asset(
                                     'assets/images/ChatGPT_Image_24_04_2026,_12_09_37.png',
-                                    width: 181.1,
-                                    height: 148.78,
+                                    width: 152.05,
+                                    height: 148.8,
                                     fit: BoxFit.fill,
                                     alignment: Alignment(0.0, 0.0),
                                   ),
