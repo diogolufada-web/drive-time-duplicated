@@ -25,14 +25,16 @@ service cloud.firestore {
     match /turnos/{document} {
       allow create: if true;
       allow read: if true;
-      allow write: if false;
+      // Retomar pausa, terminar turno, etc. usam .update() no documento.
+      allow update: if true;
       allow delete: if false;
     }
 
     match /pausas/{document} {
       allow create: if true;
       allow read: if true;
-      allow write: if false;
+      // Fechar pausa (fim_pausa, ativo: false) usa .update().
+      allow update: if true;
       allow delete: if false;
     }
   }

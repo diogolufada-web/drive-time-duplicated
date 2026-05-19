@@ -892,6 +892,19 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                           _shouldSetState =
                                                               true;
 
+                                                          if (_model.pausadoc ==
+                                                              null) {
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              SnackBar(
+                                                                content: Text(
+                                                                    'Não foi possível encontrar a pausa activa. Verifica as regras do Firestore e os índices.'),
+                                                              ),
+                                                            );
+                                                            return;
+                                                          }
+
                                                           await _model.pausadoc!
                                                               .reference
                                                               .update(
@@ -1028,6 +1041,20 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                                   .firstOrNull);
                                                           _shouldSetState =
                                                               true;
+
+                                                          if (_model
+                                                                  .pausastopdoc ==
+                                                              null) {
+                                                            ScaffoldMessenger
+                                                                    .of(context)
+                                                                .showSnackBar(
+                                                              SnackBar(
+                                                                content: Text(
+                                                                    'Não foi possível encontrar a pausa activa para terminar o turno.'),
+                                                              ),
+                                                            );
+                                                            return;
+                                                          }
 
                                                           await _model
                                                               .pausastopdoc!
