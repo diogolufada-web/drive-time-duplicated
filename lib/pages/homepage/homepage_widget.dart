@@ -3,6 +3,7 @@ import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/custom_code/actions/index.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
 import 'package:collection/collection.dart';
@@ -35,13 +36,58 @@ class _HomepageWidgetState extends State<HomepageWidget> {
   late HomepageModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _shiftBusy = false;
+
+  bool _isShiftPausa(TurnosRecord turno) {
+    final e = turno.estado.trim().toLowerCase();
+    return e == 'pausa' || e == 'em_pausa' || e == 'empausa';
+  }
+
+  /// RETOMAR se `estado` for pausa ou existir pausa activa ligada ao turno.
+  bool _showRetomarLabel(
+    TurnosRecord turno,
+    List<PausasRecord> activePausasForTurno,
+  ) =>
+      _isShiftPausa(turno) || activePausasForTurno.isNotEmpty;
+
+  void _showShiftSnack(String message) {
+    if (!mounted) {
+      return;
+    }
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), duration: const Duration(seconds: 4)),
+    );
+  }
+
+  Future<TurnosRecord?> _loadFreshActiveTurno(TurnosRecord turno) async {
+    try {
+      final fresh = await TurnosRecord.getDocumentOnce(turno.reference);
+      if (!fresh.ativo) {
+        _showShiftSnack('Este turno já não está activo.');
+        return null;
+      }
+      return fresh;
+    } catch (e) {
+      _showShiftSnack('Não foi possível actualizar o turno.');
+      return null;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => HomepageModel());
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _model.veiculodoc = await queryVeiculosRecordOnce(
+        queryBuilder: (veiculosRecord) => veiculosRecord
+            .where('email', isEqualTo: currentUserEmail)
+            .where('ativo', isEqualTo: true),
+        singleRecord: true,
+      ).then((s) => s.firstOrNull);
+      safeSetState(() {});
+    });
   }
 
   @override
@@ -49,6 +95,48 @@ class _HomepageWidgetState extends State<HomepageWidget> {
     _model.dispose();
 
     super.dispose();
+  }
+
+  Future<void> _onPauseResumePressed(TurnosRecord turno) async {
+    if (_shiftBusy) {
+      return;
+    }
+    _shiftBusy = true;
+    try {
+      final fresh = await _loadFreshActiveTurno(turno);
+      if (fresh == null) {
+        return;
+      }
+      await pauseResumeTurno(fresh);
+    } catch (e) {
+      _showShiftSnack('Erro PAUSA/RETOMAR. Tenta novamente.');
+    } finally {
+      _shiftBusy = false;
+      if (mounted) {
+        safeSetState(() {});
+      }
+    }
+  }
+
+  Future<void> _onStopPressed(TurnosRecord turno) async {
+    if (_shiftBusy) {
+      return;
+    }
+    _shiftBusy = true;
+    try {
+      final fresh = await _loadFreshActiveTurno(turno);
+      if (fresh == null) {
+        return;
+      }
+      await stopTurno(fresh);
+    } catch (e) {
+      _showShiftSnack('Erro STOP. Tenta novamente.');
+    } finally {
+      _shiftBusy = false;
+      if (mounted) {
+        safeSetState(() {});
+      }
+    }
   }
 
   @override
@@ -674,335 +762,428 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                     ),
                                                   ),
                                                 ),
-                                                if (!(containerTurnosRecord !=
-                                                    null))
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsets.all(10.0),
-                                                    child: FFButtonWidget(
-                                                      onPressed: () async {
-                                                        _model.motoristadoc =
-                                                            await queryMotoristasRecordOnce(
-                                                          queryBuilder:
-                                                              (motoristasRecord) =>
-                                                                  motoristasRecord
-                                                                      .where(
+                                                if (containerTurnosRecord ==
+                                                    null)
+                                                  StreamBuilder<
+                                                      List<VeiculosRecord>>(
+                                                    stream: queryVeiculosRecord(
+                                                      queryBuilder: (q) => q
+                                                          .where(
                                                             'email',
                                                             isEqualTo:
                                                                 currentUserEmail,
+                                                          )
+                                                          .where(
+                                                            'ativo',
+                                                            isEqualTo: true,
                                                           ),
-                                                          singleRecord: true,
-                                                        ).then((s) =>
-                                                                s.firstOrNull);
-                                                        _model.veiculodoc =
-                                                            await queryVeiculosRecordOnce(
-                                                          queryBuilder:
-                                                              (veiculosRecord) =>
-                                                                  veiculosRecord
-                                                                      .where(
-                                                                        'email',
-                                                                        isEqualTo:
-                                                                            currentUserEmail,
-                                                                      )
-                                                                      .where(
-                                                                        'ativo',
-                                                                        isEqualTo:
-                                                                            true,
-                                                                      ),
-                                                          singleRecord: true,
-                                                        ).then((s) =>
-                                                                s.firstOrNull);
-
-                                                        await TurnosRecord
-                                                            .collection
-                                                            .doc()
-                                                            .set(
-                                                                createTurnosRecordData(
-                                                              email:
-                                                                  currentUserEmail,
-                                                              estado: 'ativo',
-                                                              inicioTurno:
-                                                                  getCurrentTimestamp,
-                                                              ativo: true,
-                                                              data:
-                                                                  getCurrentTimestamp,
-                                                              dataDia: dateTimeFormat(
-                                                                  "yyyy-MM-dd",
-                                                                  getCurrentTimestamp),
-                                                              fimTurno:
-                                                                  containerTurnosRecord
-                                                                      ?.fimTurno,
-                                                              nomeMotorista: _model
-                                                                  .motoristadoc
-                                                                  ?.nome,
-                                                              certificadoCmtvde: _model
-                                                                  .motoristadoc
-                                                                  ?.certeficadocmtvde,
-                                                              matricula: _model
-                                                                  .veiculodoc
-                                                                  ?.matricula,
-                                                              licencaOperador: _model
-                                                                  .veiculodoc
-                                                                  ?.licencaoperador,
-                                                            ));
-
-                                                        safeSetState(() {});
-                                                      },
-                                                      text: 'Iniciar Turno',
-                                                      options: FFButtonOptions(
-                                                        width: double.infinity,
-                                                        height: 40.0,
-                                                        padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    16.0,
-                                                                    0.0,
-                                                                    16.0,
-                                                                    0.0),
-                                                        iconAlignment:
-                                                            IconAlignment.start,
-                                                        iconPadding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0),
-                                                        color:
-                                                            Color(0xFFC9A227),
-                                                        textStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .titleSmall
-                                                                .override(
-                                                          font: GoogleFonts
-                                                              .interTight(
-                                                            fontWeight:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .titleSmall
-                                                                    .fontWeight,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .titleSmall
-                                                                    .fontStyle,
-                                                          ),
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .primaryText,
-                                                          letterSpacing: 0.0,
-                                                          fontWeight:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .titleSmall
-                                                                  .fontWeight,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .titleSmall
-                                                                  .fontStyle,
-                                                          shadows: [
-                                                            Shadow(
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .secondaryText,
-                                                              offset: Offset(
-                                                                  2.0, 2.0),
-                                                              blurRadius: 2.0,
-                                                            )
-                                                          ],
-                                                        ),
-                                                        elevation: 0.0,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8.0),
-                                                      ),
+                                                      singleRecord: true,
                                                     ),
-                                                  ),
-                                                if (containerTurnosRecord !=
-                                                    null)
-                                                  Padding(
-                                                    padding:
-                                                        EdgeInsets.all(10.0),
-                                                    child: FFButtonWidget(
-                                                      onPressed: () async {
-                                                        var _shouldSetState =
-                                                            false;
-                                                        if (containerTurnosRecord
-                                                                .estado ==
-                                                            'ativo') {
-                                                          await PausasRecord
-                                                              .collection
-                                                              .doc()
-                                                              .set(
-                                                                  createPausasRecordData(
-                                                                email:
-                                                                    currentUserEmail,
-                                                                turnoRef:
-                                                                    containerTurnosRecord
-                                                                        .reference,
-                                                                dataDia:
-                                                                    valueOrDefault<
-                                                                        String>(
-                                                                  dateTimeFormat(
-                                                                      "yyyy-MM-dd",
-                                                                      getCurrentTimestamp),
-                                                                  'yyyy-MM-dd',
+                                                    builder: (context,
+                                                        veicSnap) {
+                                                      final activeVeiculo =
+                                                          veicSnap.hasData &&
+                                                                  veicSnap
+                                                                      .data!
+                                                                      .isNotEmpty
+                                                              ? veicSnap
+                                                                  .data!.first
+                                                              : null;
+                                                      final hasVeiculo =
+                                                          activeVeiculo !=
+                                                              null;
+
+                                                      if (!hasVeiculo) {
+                                                        return Column(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            Padding(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                horizontal:
+                                                                    10.0,
+                                                              ),
+                                                              child: Text(
+                                                                'Regista o teu veículo antes do primeiro turno.',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                style: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .bodyMedium
+                                                                    .override(
+                                                                  font: GoogleFonts
+                                                                      .inter(
+                                                                    fontSize:
+                                                                        14.0,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                  ),
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .primaryText,
+                                                                  letterSpacing:
+                                                                      0.0,
                                                                 ),
-                                                                inicioPausa:
-                                                                    getCurrentTimestamp,
-                                                                ativo: true,
-                                                              ));
-
-                                                          await containerTurnosRecord
-                                                              .reference
-                                                              .update(
-                                                                  createTurnosRecordData(
-                                                            estado: 'pausa',
-                                                            ativo: true,
-                                                          ));
-                                                          if (_shouldSetState)
-                                                            safeSetState(() {});
-                                                          return;
-                                                        } else {
-                                                          _model.pausadoc =
-                                                              await queryPausasRecordOnce(
-                                                            queryBuilder:
-                                                                (pausasRecord) =>
-                                                                    pausasRecord
+                                                              ),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  EdgeInsets.all(
+                                                                      10.0),
+                                                              child:
+                                                                  FFButtonWidget(
+                                                                onPressed:
+                                                                    () async {
+                                                                  await context
+                                                                      .pushNamed(
+                                                                    DadosveiculosWidget
+                                                                        .routeName,
+                                                                  );
+                                                                  _model.veiculodoc =
+                                                                      await queryVeiculosRecordOnce(
+                                                                    queryBuilder: (q) => q
                                                                         .where(
                                                                           'email',
                                                                           isEqualTo:
                                                                               currentUserEmail,
                                                                         )
                                                                         .where(
-                                                                          'turno_ref',
-                                                                          isEqualTo:
-                                                                              containerTurnosRecord.reference,
-                                                                        )
-                                                                        .where(
                                                                           'ativo',
                                                                           isEqualTo:
                                                                               true,
                                                                         ),
-                                                            singleRecord: true,
-                                                          ).then((s) => s
-                                                                  .firstOrNull);
-                                                          _shouldSetState =
-                                                              true;
-
-                                                          if (_model.pausadoc ==
-                                                              null) {
-                                                            ScaffoldMessenger
-                                                                    .of(context)
-                                                                .showSnackBar(
-                                                              SnackBar(
-                                                                content: Text(
-                                                                    'Não foi possível encontrar a pausa activa. Verifica as regras do Firestore e os índices.'),
+                                                                    singleRecord:
+                                                                        true,
+                                                                  ).then((s) =>
+                                                                          s.firstOrNull);
+                                                                  safeSetState(
+                                                                      () {});
+                                                                },
+                                                                text:
+                                                                    'Adicionar veículo',
+                                                                icon: Icon(
+                                                                  Icons
+                                                                      .directions_car_outlined,
+                                                                  size: 20.0,
+                                                                ),
+                                                                options:
+                                                                    FFButtonOptions(
+                                                                  width: double
+                                                                      .infinity,
+                                                                  height: 40.0,
+                                                                  padding: EdgeInsetsDirectional
+                                                                      .fromSTEB(
+                                                                    16.0,
+                                                                    0.0,
+                                                                    16.0,
+                                                                    0.0,
+                                                                  ),
+                                                                  color: Color(
+                                                                      0xFFC9A227),
+                                                                  textStyle: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .titleSmall
+                                                                      .override(
+                                                                    font: GoogleFonts
+                                                                        .interTight(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                    color: FlutterFlowTheme.of(
+                                                                            context)
+                                                                        .primaryText,
+                                                                    letterSpacing:
+                                                                        0.0,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                  ),
+                                                                  elevation:
+                                                                      0.0,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                    8.0,
+                                                                  ),
+                                                                ),
                                                               ),
-                                                            );
-                                                            return;
-                                                          }
+                                                            ),
+                                                          ],
+                                                        );
+                                                      }
 
-                                                          await _model.pausadoc!
-                                                              .reference
-                                                              .update(
-                                                                  createPausasRecordData(
-                                                            fimPausa:
-                                                                getCurrentTimestamp,
-                                                            ativo: false,
-                                                          ));
-
-                                                          await containerTurnosRecord
-                                                              .reference
-                                                              .update(
-                                                                  createTurnosRecordData(
-                                                            estado: 'ativo',
-                                                            ativo: true,
-                                                          ));
-                                                          if (_shouldSetState)
-                                                            safeSetState(() {});
-                                                          return;
-                                                        }
-
-                                                        if (_shouldSetState)
-                                                          safeSetState(() {});
-                                                      },
-                                                      text: containerTurnosRecord
-                                                                  .estado ==
-                                                              'pausa'
-                                                          ? 'RETOMAR'
-                                                          : 'PAUSA',
-                                                      options: FFButtonOptions(
-                                                        width: double.infinity,
-                                                        height: 40.0,
+                                                      return Padding(
                                                         padding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    16.0,
-                                                                    0.0,
-                                                                    16.0,
-                                                                    0.0),
-                                                        iconPadding:
-                                                            EdgeInsetsDirectional
-                                                                .fromSTEB(
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0),
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .primaryText,
-                                                        textStyle:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .titleSmall
-                                                                .override(
-                                                          font: GoogleFonts
-                                                              .interTight(
-                                                            fontWeight:
+                                                            EdgeInsets.all(
+                                                                10.0),
+                                                        child: FFButtonWidget(
+                                                          onPressed: () async {
+                                                            _model.motoristadoc =
+                                                                await queryMotoristasRecordOnce(
+                                                              queryBuilder: (motoristasRecord) =>
+                                                                  motoristasRecord
+                                                                      .where(
+                                                                'email',
+                                                                isEqualTo:
+                                                                    currentUserEmail,
+                                                              ),
+                                                              singleRecord:
+                                                                  true,
+                                                            ).then((s) => s
+                                                                    .firstOrNull);
+                                                            _model.veiculodoc =
+                                                                activeVeiculo;
+
+                                                            await TurnosRecord
+                                                                .collection
+                                                                .doc()
+                                                                .set(
+                                                                    createTurnosRecordData(
+                                                                  email:
+                                                                      currentUserEmail,
+                                                                  estado:
+                                                                      'ativo',
+                                                                  inicioTurno:
+                                                                      getCurrentTimestamp,
+                                                                  ativo: true,
+                                                                  data:
+                                                                      getCurrentTimestamp,
+                                                                  dataDia:
+                                                                      dateTimeFormat(
+                                                                    'yyyy-MM-dd',
+                                                                    getCurrentTimestamp,
+                                                                  ),
+                                                                  nomeMotorista:
+                                                                      _model
+                                                                          .motoristadoc
+                                                                          ?.nome,
+                                                                  certificadoCmtvde: _model
+                                                                      .motoristadoc
+                                                                      ?.certeficadocmtvde,
+                                                                  matricula:
+                                                                      activeVeiculo
+                                                                          .matricula,
+                                                                  licencaOperador:
+                                                                      activeVeiculo
+                                                                          .licencaoperador,
+                                                                ));
+
+                                                            safeSetState(
+                                                                () {});
+                                                          },
+                                                          text:
+                                                              'Iniciar Turno',
+                                                          options:
+                                                              FFButtonOptions(
+                                                            width:
+                                                                double.infinity,
+                                                            height: 40.0,
+                                                            padding:
+                                                                EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                              16.0,
+                                                              0.0,
+                                                              16.0,
+                                                              0.0,
+                                                            ),
+                                                            iconAlignment:
+                                                                IconAlignment
+                                                                    .start,
+                                                            iconPadding:
+                                                                EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                              0.0,
+                                                              0.0,
+                                                              0.0,
+                                                              0.0,
+                                                            ),
+                                                            color: Color(
+                                                                0xFFC9A227),
+                                                            textStyle:
                                                                 FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .titleSmall
+                                                                    .override(
+                                                              font: GoogleFonts
+                                                                  .interTight(
+                                                                fontWeight: FlutterFlowTheme.of(
                                                                         context)
                                                                     .titleSmall
                                                                     .fontWeight,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
+                                                                fontStyle: FlutterFlowTheme.of(
                                                                         context)
                                                                     .titleSmall
                                                                     .fontStyle,
-                                                          ),
-                                                          color:
-                                                              Color(0xFFC9A227),
-                                                          letterSpacing: 0.0,
-                                                          fontWeight:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .titleSmall
-                                                                  .fontWeight,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .titleSmall
-                                                                  .fontStyle,
-                                                          shadows: [
-                                                            Shadow(
+                                                              ),
                                                               color: FlutterFlowTheme
                                                                       .of(context)
-                                                                  .secondaryText,
-                                                              offset: Offset(
-                                                                  2.0, 2.0),
-                                                              blurRadius: 2.0,
-                                                            )
-                                                          ],
+                                                                  .primaryText,
+                                                              letterSpacing:
+                                                                  0.0,
+                                                              fontWeight:
+                                                                  FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .titleSmall
+                                                                      .fontWeight,
+                                                              fontStyle:
+                                                                  FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .titleSmall
+                                                                      .fontStyle,
+                                                              shadows: [
+                                                                Shadow(
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .secondaryText,
+                                                                  offset: Offset(
+                                                                    2.0,
+                                                                    2.0,
+                                                                  ),
+                                                                  blurRadius:
+                                                                      2.0,
+                                                                )
+                                                              ],
+                                                            ),
+                                                            elevation: 0.0,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                              8.0,
+                                                            ),
+                                                          ),
                                                         ),
-                                                        elevation: 0.0,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8.0),
-                                                      ),
+                                                      );
+                                                    },
+                                                  ),
+                                                if (containerTurnosRecord !=
+                                                    null)
+                                                  StreamBuilder<
+                                                      List<PausasRecord>>(
+                                                    stream: queryPausasRecord(
+                                                      queryBuilder: (q) => q
+                                                          .where(
+                                                            'email',
+                                                            isEqualTo:
+                                                                currentUserEmail,
+                                                          )
+                                                          .where(
+                                                            'turno_ref',
+                                                            isEqualTo:
+                                                                containerTurnosRecord
+                                                                    .reference,
+                                                          )
+                                                          .where(
+                                                            'ativo',
+                                                            isEqualTo: true,
+                                                          ),
                                                     ),
+                                                    builder: (context,
+                                                        pausaSnap) {
+                                                      final activePausas =
+                                                          pausaSnap.data ?? [];
+                                                      final showRetomar =
+                                                          _showRetomarLabel(
+                                                        containerTurnosRecord,
+                                                        activePausas,
+                                                      );
+                                                      return Padding(
+                                                        padding:
+                                                            EdgeInsets.all(
+                                                                10.0),
+                                                        child: FFButtonWidget(
+                                                          key: ValueKey(
+                                                            'pause-${containerTurnosRecord.reference.id}-$showRetomar',
+                                                          ),
+                                                          onPressed: () async {
+                                                            await _onPauseResumePressed(
+                                                              containerTurnosRecord,
+                                                            );
+                                                          },
+                                                          text: showRetomar
+                                                              ? 'RETOMAR'
+                                                              : 'PAUSA',
+                                                          options:
+                                                              FFButtonOptions(
+                                                            width:
+                                                                double.infinity,
+                                                            height: 40.0,
+                                                            padding:
+                                                                EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                              16.0,
+                                                              0.0,
+                                                              16.0,
+                                                              0.0,
+                                                            ),
+                                                            iconPadding:
+                                                                EdgeInsetsDirectional
+                                                                    .fromSTEB(
+                                                              0.0,
+                                                              0.0,
+                                                              0.0,
+                                                              0.0,
+                                                            ),
+                                                            color: FlutterFlowTheme
+                                                                    .of(context)
+                                                                .primaryText,
+                                                            textStyle:
+                                                                FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .titleSmall
+                                                                    .override(
+                                                              font: GoogleFonts
+                                                                  .interTight(
+                                                                fontWeight: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .titleSmall
+                                                                    .fontWeight,
+                                                                fontStyle: FlutterFlowTheme.of(
+                                                                        context)
+                                                                    .titleSmall
+                                                                    .fontStyle,
+                                                              ),
+                                                              color: Color(
+                                                                  0xFFC9A227),
+                                                              letterSpacing:
+                                                                  0.0,
+                                                              fontWeight:
+                                                                  FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .titleSmall
+                                                                      .fontWeight,
+                                                              fontStyle:
+                                                                  FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .titleSmall
+                                                                      .fontStyle,
+                                                              shadows: [
+                                                                Shadow(
+                                                                  color: FlutterFlowTheme.of(
+                                                                          context)
+                                                                      .secondaryText,
+                                                                  offset: Offset(
+                                                                    2.0,
+                                                                    2.0,
+                                                                  ),
+                                                                  blurRadius:
+                                                                      2.0,
+                                                                )
+                                                              ],
+                                                            ),
+                                                            elevation: 0.0,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                              8.0,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
                                                   ),
                                                 if (containerTurnosRecord !=
                                                     null)
@@ -1011,90 +1192,9 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                         EdgeInsets.all(10.0),
                                                     child: FFButtonWidget(
                                                       onPressed: () async {
-                                                        var _shouldSetState =
-                                                            false;
-                                                        if (containerTurnosRecord
-                                                                .estado ==
-                                                            'pausa') {
-                                                          _model.pausastopdoc =
-                                                              await queryPausasRecordOnce(
-                                                            queryBuilder:
-                                                                (pausasRecord) =>
-                                                                    pausasRecord
-                                                                        .where(
-                                                                          'email',
-                                                                          isEqualTo:
-                                                                              currentUserEmail,
-                                                                        )
-                                                                        .where(
-                                                                          'turno_ref',
-                                                                          isEqualTo:
-                                                                              containerTurnosRecord.reference,
-                                                                        )
-                                                                        .where(
-                                                                          'ativo',
-                                                                          isEqualTo:
-                                                                              true,
-                                                                        ),
-                                                            singleRecord: true,
-                                                          ).then((s) => s
-                                                                  .firstOrNull);
-                                                          _shouldSetState =
-                                                              true;
-
-                                                          if (_model
-                                                                  .pausastopdoc ==
-                                                              null) {
-                                                            ScaffoldMessenger
-                                                                    .of(context)
-                                                                .showSnackBar(
-                                                              SnackBar(
-                                                                content: Text(
-                                                                    'Não foi possível encontrar a pausa activa para terminar o turno.'),
-                                                              ),
-                                                            );
-                                                            return;
-                                                          }
-
-                                                          await _model
-                                                              .pausastopdoc!
-                                                              .reference
-                                                              .update(
-                                                                  createPausasRecordData(
-                                                            fimPausa:
-                                                                getCurrentTimestamp,
-                                                            ativo: false,
-                                                          ));
-
-                                                          await containerTurnosRecord
-                                                              .reference
-                                                              .update(
-                                                                  createTurnosRecordData(
-                                                            fimTurno:
-                                                                getCurrentTimestamp,
-                                                            estado: 'terminado',
-                                                            ativo: false,
-                                                          ));
-                                                          if (_shouldSetState)
-                                                            safeSetState(() {});
-                                                          return;
-                                                        } else {
-                                                          await containerTurnosRecord
-                                                              .reference
-                                                              .update(
-                                                                  createTurnosRecordData(
-                                                            fimTurno:
-                                                                getCurrentTimestamp,
-                                                            estado: 'terminado',
-                                                            ativo: false,
-                                                          ));
-                                                          if (_shouldSetState)
-                                                            safeSetState(() {});
-                                                          return;
-                                                        }
-
-                                                        if (_shouldSetState)
-                                                          safeSetState(() {});
+                                                        await _onStopPressed(
+                                                          containerTurnosRecord,
+                                                        );
                                                       },
                                                       text: 'STOP',
                                                       options: FFButtonOptions(

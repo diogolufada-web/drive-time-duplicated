@@ -4,7 +4,6 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/index.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'loginpage_model.dart';
 export 'loginpage_model.dart';
@@ -28,17 +27,6 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => LoginpageModel());
-
-    // On page load action.
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      GoRouter.of(context).prepareAuthEvent();
-      final user = await authManager.signInWithGoogle(context);
-      if (user == null) {
-        return;
-      }
-
-      context.goNamedAuth(HomepageWidget.routeName, context.mounted);
-    });
 
     _model.emailTextController ??= TextEditingController();
     _model.textFieldFocusNode1 ??= FocusNode();

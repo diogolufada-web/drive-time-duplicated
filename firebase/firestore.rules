@@ -1,41 +1,92 @@
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /motoristas/{document} {
-      allow create: if true;
-      allow read: if true;
-      allow write: if true;
-      allow delete: if false;
-    }
-
-    match /users/{document} {
-      allow create: if true;
-      allow read: if true;
-      allow write: if true;
-      allow delete: if false;
-    }
-
-    match /veiculos/{document} {
-      allow create: if true;
-      allow read: if true;
-      allow write: if false;
-      allow delete: if false;
-    }
-
-    match /turnos/{document} {
-      allow create: if true;
-      allow read: if true;
-      // Retomar pausa, terminar turno, etc. usam .update() no documento.
-      allow update: if true;
-      allow delete: if false;
-    }
-
-    match /pausas/{document} {
-      allow create: if true;
-      allow read: if true;
-      // Fechar pausa (fim_pausa, ativo: false) usa .update().
-      allow update: if true;
-      allow delete: if false;
-    }
-  }
-}
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function authEmail() {
+      return request.auth.token.email;
+    }
+
+    function ownsEmailOnRead() {
+      return isSignedIn()
+        && resource.data.email is string
+        && resource.data.email == authEmail();
+    }
+
+    function ownsEmailOnCreate() {
+      return isSignedIn()
+        && request.resource.data.email is string
+        && request.resource.data.email == authEmail();
+    }
+
+    function ownsEmailOnUpdate() {
+      return isSignedIn()
+        && resource.data.email is string
+        && resource.data.email == authEmail()
+        && request.resource.data.email == resource.data.email;
+    }
+
+    function ownsUserDoc() {
+      return isSignedIn()
+        && (
+          (resource.data.uid is string && resource.data.uid == request.auth.uid)
+          || (resource.data.email is string && resource.data.email == authEmail())
+        );
+    }
+
+    function ownsUserDocOnCreate() {
+      return isSignedIn()
+        && (
+          (request.resource.data.uid is string
+            && request.resource.data.uid == request.auth.uid)
+          || (request.resource.data.email is string
+            && request.resource.data.email == authEmail())
+        );
+    }
+
+    function ownsUserDocOnUpdate() {
+      return isSignedIn()
+        && ownsUserDoc()
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.email == resource.data.email;
+    }
+
+    match /motoristas/{document} {
+      allow create: if ownsEmailOnCreate();
+      allow read: if ownsEmailOnRead();
+      allow update: if ownsEmailOnUpdate();
+      allow delete: if false;
+    }
+
+    match /users/{document} {
+      allow create: if ownsUserDocOnCreate();
+      allow read: if ownsUserDoc();
+      allow update: if ownsUserDocOnUpdate();
+      allow delete: if false;
+    }
+
+    match /veiculos/{document} {
+      allow create: if ownsEmailOnCreate();
+      allow read: if ownsEmailOnRead();
+      allow update: if ownsEmailOnUpdate();
+      allow delete: if false;
+    }
+
+    match /turnos/{document} {
+      allow create: if ownsEmailOnCreate();
+      allow read: if ownsEmailOnRead();
+      allow update: if ownsEmailOnUpdate();
+      allow delete: if false;
+    }
+
+    match /pausas/{document} {
+      allow create: if ownsEmailOnCreate();
+      allow read: if ownsEmailOnRead();
+      allow update: if ownsEmailOnUpdate();
+      allow delete: if false;
+    }
+  }
+}

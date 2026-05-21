@@ -1,0 +1,40 @@
+{
+  "gerar_relatorio_p_d_f.dart": {
+    "old_identifier_name": "gerarRelatorioPDF",
+    "new_identifier_name": "gerarRelatorioPDF",
+    "type": "A",
+    "is_deleted": false,
+    "original_checksum": "f4f7ae99f842a8b81704789ce831ce4eea9f8c06ce8fbd009cb9a89dee839f4e",
+    "current_checksum": "f4f7ae99f842a8b81704789ce831ce4eea9f8c06ce8fbd009cb9a89dee839f4e"
+  },
+  "pause_resume_turno.dart": {
+    "old_identifier_name": "pauseResumeTurno",
+    "new_identifier_name": "pauseResumeTurno",
+    "type": "A",
+    "is_deleted": false,
+    "original_checksum": "992be36903948d82c5f785f13ceb8d2c01a3557b123140c02ba8dc75fd939b5b",
+    "current_checksum": "992be36903948d82c5f785f13ceb8d2c01a3557b123140c02ba8dc75fd939b5b"
+  },
+  "stop_turno.dart": {
+    "old_identifier_name": "stopTurno",
+    "new_identifier_name": "stopTurno",
+    "type": "A",
+    "is_deleted": false,
+    "original_checksum": "14a84a3c27b15b4b807cf105a86893b23f18efa89136731272d9b463b9a95121",
+    "current_checksum": "14a84a3c27b15b4b807cf105a86893b23f18efa89136731272d9b463b9a95121"
+  },
+  "custom_functions.dart": {
+    "old_identifier_name": "CustomFunctions",
+    "new_identifier_name": "CustomFunctions",
+    "type": "F",
+    "is_deleted": false,
+    "original_checksum": "8fbb880533033fe20e2d1293dfc2438fcfcd705528b99785360d250ece27116e",
+    "current_checksum": "8fbb880533033fe20e2d1293dfc2438fcfcd705528b99785360d250ece27116e"
+  },
+  "pubspec.yaml": {
+    "old_identifier_name": "pubspec.yaml",
+    "new_identifier_name": "pubspec.yaml",
+    "type": "D",
+    "is_deleted": false
+  }
+}

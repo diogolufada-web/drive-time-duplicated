@@ -112,26 +112,31 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: HistoricopageWidget.routeName,
           path: HistoricopageWidget.routePath,
+          requireAuth: true,
           builder: (context, params) => HistoricopageWidget(),
         ),
         FFRoute(
           name: RelatoriospageWidget.routeName,
           path: RelatoriospageWidget.routePath,
+          requireAuth: true,
           builder: (context, params) => RelatoriospageWidget(),
         ),
         FFRoute(
           name: DefenioespageWidget.routeName,
           path: DefenioespageWidget.routePath,
+          requireAuth: true,
           builder: (context, params) => DefenioespageWidget(),
         ),
         FFRoute(
           name: DadosmotoristaWidget.routeName,
           path: DadosmotoristaWidget.routePath,
+          requireAuth: true,
           builder: (context, params) => DadosmotoristaWidget(),
         ),
         FFRoute(
           name: DadosveiculosWidget.routeName,
           path: DadosveiculosWidget.routePath,
+          requireAuth: true,
           builder: (context, params) => DadosveiculosWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),

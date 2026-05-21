@@ -5,7 +5,6 @@ import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/index.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'registerpage_model.dart';
 export 'registerpage_model.dart';
@@ -29,11 +28,6 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => RegisterpageModel());
-
-    // On page load action.
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      context.pushNamed(HomepageWidget.routeName);
-    });
 
     _model.emailTextController ??= TextEditingController();
     _model.textFieldFocusNode1 ??= FocusNode();
@@ -924,7 +918,9 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                         ));
 
                     context.goNamedAuth(
-                        LoginpageWidget.routeName, context.mounted);
+                      DadosveiculosWidget.routeName,
+                      context.mounted,
+                    );
                   },
                   text: 'Criar Conta',
                   options: FFButtonOptions(
