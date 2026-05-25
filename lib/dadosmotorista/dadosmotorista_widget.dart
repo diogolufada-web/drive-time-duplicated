@@ -109,9 +109,9 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                     scrollDirection: Axis.vertical,
                     children: [
                       Image.asset(
-                        driveTimeTextLogoAsset(context),
-                        width: 220.0,
-                        height: 72.0,
+                        driveTimeLogoAsset(context),
+                        width: 180.0,
+                        height: 180.0,
                         fit: BoxFit.contain,
                       ),
                       GradientText(
