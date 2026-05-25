@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '/auth/firebase_auth/auth_util.dart';
+import '/flutter_flow/internationalization.dart';
+import '/services/notifications_service.dart';
 
 void _showSnack(String message) {
   debugPrint('pauseResumeTurno: $message');
@@ -46,11 +48,11 @@ bool _estadoIndicaPausa(String? estado) {
 /// Parâmetro FlutterFlow: [turno] = Document (Turnos Record), ex. containerTurnosRecord
 Future<void> pauseResumeTurno(TurnosRecord? turno) async {
   if (turno == null) {
-    _showSnack('Sem turno activo.');
+    _showSnack(tr('shift.noActive'));
     return;
   }
   if (currentUserEmail.isEmpty) {
-    _showSnack('Utilizador não autenticado.');
+    _showSnack(tr('shift.notAuthenticated'));
     return;
   }
 
@@ -59,11 +61,11 @@ Future<void> pauseResumeTurno(TurnosRecord? turno) async {
   try {
     final fresh = await TurnosRecord.getDocumentOnce(turnoRef);
     if (!fresh.ativo) {
-      _showSnack('Este turno já não está activo.');
+      _showSnack(tr('home.shiftInactive'));
       return;
     }
     if (fresh.email.isNotEmpty && fresh.email != currentUserEmail) {
-      _showSnack('Turno não pertence a este utilizador.');
+      _showSnack(tr('shift.notOwner'));
       return;
     }
 
@@ -92,7 +94,8 @@ Future<void> pauseResumeTurno(TurnosRecord? turno) async {
         createTurnosRecordData(estado: 'pausa', ativo: true),
       );
       await batch.commit();
-      _showSnack('Pausa iniciada.');
+      await NotificationsService.instance.pauseShiftAlerts();
+      _showSnack(tr('shift.pauseStarted'));
       return;
     }
 
@@ -109,9 +112,10 @@ Future<void> pauseResumeTurno(TurnosRecord? turno) async {
       createTurnosRecordData(estado: 'ativo', ativo: true),
     );
     await batch.commit();
-    _showSnack('Turno retomado.');
+    await NotificationsService.instance.resumeShiftAlerts();
+    _showSnack(tr('shift.resumed'));
   } catch (e, st) {
     debugPrint('pauseResumeTurno error: $e\n$st');
-    _showSnack('Erro ao pausar/retomar. Tenta novamente.');
+    _showSnack(tr('shift.pauseResumeFailed'));
   }
 }

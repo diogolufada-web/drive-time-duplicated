@@ -53,7 +53,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: Colors.black,
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         body: SafeArea(
           top: true,
           child: Column(
@@ -64,7 +64,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12.0),
                   child: Image.asset(
-                    'assets/images/ChatGPT_Image_24_04_2026,_12_09_37.png',
+                    driveTimeLogoAsset(context),
                     width: 380.1,
                     height: 317.67,
                     fit: BoxFit.cover,
@@ -98,7 +98,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
                         EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                     iconPadding:
                         EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: Color(0xFFC9A227),
+                    color: Color(0xFFD4AF37),
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                       font: GoogleFonts.interTight(
                         fontWeight: FontWeight.bold,
@@ -386,7 +386,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
                   onPressed: () async {
                     context.goNamed(RegisterpageWidget.routeName);
                   },
-                  text: 'Criar Conta',
+                  text: tr('login.createAccount'),
                   options: FFButtonOptions(
                     width: 263.29,
                     height: 48.9,
@@ -394,7 +394,7 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
                         EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                     iconPadding:
                         EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: Color(0xFFC9A227),
+                    color: Color(0xFFD4AF37),
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                       font: GoogleFonts.interTight(
                         fontWeight:

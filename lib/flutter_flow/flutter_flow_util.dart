@@ -27,6 +27,7 @@ export 'package:cloud_firestore/cloud_firestore.dart'
     show DocumentReference, FirebaseFirestore;
 export 'package:page_transition/page_transition.dart';
 export 'nav/nav.dart';
+export 'internationalization.dart';
 
 T valueOrDefault<T>(T? value, T defaultValue) =>
     (value is String && value.isEmpty) || value == null ? defaultValue : value;
@@ -273,6 +274,30 @@ extension StringDocRef on String {
 
 void setDarkModeSetting(BuildContext context, ThemeMode themeMode) =>
     MyApp.of(context).setThemeMode(themeMode);
+
+Future<void> setAppLanguage(BuildContext context, String languageCode) =>
+    MyApp.of(context).setLocale(Locale(languageCode));
+
+/// Caminho do logotipo COMPLETO (com tagline "TEMPO. FOCO. RESULTADOS.")
+/// adequado ao tema actual. Usar apenas no Login / Register.
+String driveTimeLogoAsset(BuildContext context) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  return isDark
+      ? 'assets/images/drive_time_logo_dark.png'
+      : 'assets/images/drive_time_logo_light.png';
+}
+
+/// Versao SO texto "DRIVE TIME" (sem tagline), para cabecalhos de paginas
+/// internas (Definicoes, Historico, Relatorios, Dados...).
+String driveTimeTextLogoAsset(BuildContext context) {
+  final isDark = Theme.of(context).brightness == Brightness.dark;
+  return isDark
+      ? 'assets/images/drive_time_text_dark.png'
+      : 'assets/images/drive_time_text_light.png';
+}
+
+/// Apenas o simbolo DT dourado (sem texto). Universal entre temas.
+const String driveTimeMarkAsset = 'assets/images/drive_time_mark.png';
 
 void showSnackbar(
   BuildContext context,

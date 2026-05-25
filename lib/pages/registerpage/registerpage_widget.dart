@@ -69,7 +69,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: Colors.black,
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         body: SafeArea(
           top: true,
           child: Column(
@@ -80,7 +80,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(0.0),
                   child: Image.asset(
-                    'assets/images/ChatGPT_Image_24_04_2026,_12_09_37.png',
+                    driveTimeLogoAsset(context),
                     width: 200.0,
                     height: 181.19,
                     fit: BoxFit.cover,
@@ -94,7 +94,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                   onPressed: () async {
                     context.pushNamed(LoginpageWidget.routeName);
                   },
-                  text: 'Voltar Para Login',
+                  text: tr('register.backToLogin'),
                   options: FFButtonOptions(
                     width: 300.0,
                     height: 40.0,
@@ -102,7 +102,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                         EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                     iconPadding:
                         EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: Color(0xFFC9A227),
+                    color: Color(0xFFD4AF37),
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                       font: GoogleFonts.interTight(
                         fontWeight:
@@ -151,7 +151,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                                       .labelMedium
                                       .fontStyle,
                                 ),
-                                color: Color(0xFFC9A227),
+                                color: Color(0xFFD4AF37),
                                 fontSize: 14.0,
                                 letterSpacing: 0.0,
                                 fontWeight: FontWeight.bold,
@@ -255,7 +255,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                                       .labelMedium
                                       .fontStyle,
                                 ),
-                                color: Color(0xFFC9A227),
+                                color: Color(0xFFD4AF37),
                                 fontSize: 14.0,
                                 letterSpacing: 0.0,
                                 fontWeight: FontWeight.bold,
@@ -334,7 +334,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                                 .bodyMedium
                                 .fontStyle,
                           ),
-                          color: Color(0xFFC9A227),
+                          color: Color(0xFFD4AF37),
                           fontSize: 14.0,
                           letterSpacing: 0.0,
                           fontWeight: FontWeight.normal,
@@ -369,7 +369,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                                       .labelMedium
                                       .fontStyle,
                                 ),
-                                color: Color(0xFFC9A227),
+                                color: Color(0xFFD4AF37),
                                 fontSize: 14.0,
                                 letterSpacing: 0.0,
                                 fontWeight: FontWeight.bold,
@@ -486,7 +486,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                                       .labelMedium
                                       .fontStyle,
                                 ),
-                                color: Color(0xFFC9A227),
+                                color: Color(0xFFD4AF37),
                                 fontSize: 14.0,
                                 letterSpacing: 0.0,
                                 fontWeight: FontWeight.bold,
@@ -590,7 +590,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                                       .labelMedium
                                       .fontStyle,
                                 ),
-                                color: Color(0xFFC9A227),
+                                color: Color(0xFFD4AF37),
                                 fontSize: 14.0,
                                 letterSpacing: 0.0,
                                 fontWeight: FontWeight.bold,
@@ -694,7 +694,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                                       .labelMedium
                                       .fontStyle,
                                 ),
-                                color: Color(0xFFC9A227),
+                                color: Color(0xFFD4AF37),
                                 fontSize: 14.0,
                                 letterSpacing: 0.0,
                                 fontWeight: FontWeight.bold,
@@ -798,7 +798,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                                       .labelMedium
                                       .fontStyle,
                                 ),
-                                color: Color(0xFFC9A227),
+                                color: Color(0xFFD4AF37),
                                 fontSize: 14.0,
                                 letterSpacing: 0.0,
                                 fontWeight: FontWeight.bold,
@@ -922,7 +922,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                       context.mounted,
                     );
                   },
-                  text: 'Criar Conta',
+                  text: tr('register.createAccount'),
                   options: FFButtonOptions(
                     width: 300.0,
                     height: 40.0,
@@ -930,7 +930,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                         EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
                     iconPadding:
                         EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: Color(0xFFC9A227),
+                    color: Color(0xFFD4AF37),
                     textStyle: FlutterFlowTheme.of(context).titleSmall.override(
                       font: GoogleFonts.interTight(
                         fontWeight:

@@ -64,7 +64,7 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
       },
       child: Scaffold(
         key: scaffoldKey,
-        backgroundColor: Colors.black,
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         body: SafeArea(
           top: true,
           child: Align(
@@ -74,14 +74,11 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: Image.asset(
-                      'assets/images/ChatGPT_Image_24_04_2026,_12_09_37.png',
-                      width: 200.0,
-                      height: 200.0,
-                      fit: BoxFit.cover,
-                    ),
+                  Image.asset(
+                    driveTimeTextLogoAsset(context),
+                    width: 220.0,
+                    height: 72.0,
+                    fit: BoxFit.contain,
                   ),
                   GradientText(
                     'Dados do Veiculo',
@@ -101,7 +98,7 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
                         ),
                     colors: [
                       FlutterFlowTheme.of(context).primaryBackground,
-                      Color(0xFFC9A227)
+                      Color(0xFFD4AF37)
                     ],
                     gradientDirection: GradientDirection.ltr,
                     gradientType: GradientType.linear,
@@ -133,7 +130,7 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
                                           .bodyMedium
                                           .fontStyle,
                                     ),
-                                    color: Color(0xFFC9A227),
+                                    color: Color(0xFFD4AF37),
                                     fontSize: 16.0,
                                     letterSpacing: 0.0,
                                     fontWeight: FontWeight.bold,
@@ -246,7 +243,7 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
                                           .labelMedium
                                           .fontStyle,
                                     ),
-                                    color: Color(0xFFC9A227),
+                                    color: Color(0xFFD4AF37),
                                     fontSize: 16.0,
                                     letterSpacing: 0.0,
                                     fontWeight: FontWeight.bold,
@@ -353,7 +350,7 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
                                           .labelMedium
                                           .fontStyle,
                                     ),
-                                    color: Color(0xFFC9A227),
+                                    color: Color(0xFFD4AF37),
                                     fontSize: 16.0,
                                     letterSpacing: 0.0,
                                     fontWeight: FontWeight.bold,
@@ -464,7 +461,7 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
                                           .labelMedium
                                           .fontStyle,
                                     ),
-                                    color: Color(0xFFC9A227),
+                                    color: Color(0xFFD4AF37),
                                     fontSize: 16.0,
                                     letterSpacing: 0.0,
                                     fontWeight: FontWeight.bold,
@@ -575,7 +572,7 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
                                           .labelMedium
                                           .fontStyle,
                                     ),
-                                    color: Color(0xFFC9A227),
+                                    color: Color(0xFFD4AF37),
                                     fontSize: 16.0,
                                     letterSpacing: 0.0,
                                     fontWeight: FontWeight.bold,
@@ -690,7 +687,7 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
                               padding: EdgeInsets.all(12.0),
                               iconPadding: EdgeInsetsDirectional.fromSTEB(
                                   0.0, 0.0, 0.0, 0.0),
-                              color: Color(0xFFC9A227),
+                              color: Color(0xFFD4AF37),
                               textStyle: FlutterFlowTheme.of(context)
                                   .bodyMedium
                                   .override(
@@ -735,7 +732,7 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
                                   16.0, 0.0, 16.0, 0.0),
                               iconPadding: EdgeInsetsDirectional.fromSTEB(
                                   0.0, 0.0, 0.0, 0.0),
-                              color: Color(0xFFC9A227),
+                              color: Color(0xFFD4AF37),
                               textStyle: FlutterFlowTheme.of(context)
                                   .titleSmall
                                   .override(

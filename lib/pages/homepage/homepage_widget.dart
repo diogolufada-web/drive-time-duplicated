@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -6,6 +8,7 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import '/custom_code/actions/index.dart';
 import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
+import '/services/notifications_service.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -64,12 +67,12 @@ class _HomepageWidgetState extends State<HomepageWidget> {
     try {
       final fresh = await TurnosRecord.getDocumentOnce(turno.reference);
       if (!fresh.ativo) {
-        _showShiftSnack('Este turno já não está activo.');
+        _showShiftSnack(tr('home.shiftInactive'));
         return null;
       }
       return fresh;
     } catch (e) {
-      _showShiftSnack('Não foi possível actualizar o turno.');
+      _showShiftSnack(tr('home.shiftUpdateError'));
       return null;
     }
   }
@@ -109,13 +112,94 @@ class _HomepageWidgetState extends State<HomepageWidget> {
       }
       await pauseResumeTurno(fresh);
     } catch (e) {
-      _showShiftSnack('Erro PAUSA/RETOMAR. Tenta novamente.');
+      _showShiftSnack(tr('home.pauseResumeError'));
     } finally {
       _shiftBusy = false;
       if (mounted) {
         safeSetState(() {});
       }
     }
+  }
+
+  Widget _buildDriverHeader(
+    BuildContext context, {
+    required String driverName,
+  }) {
+    final theme = FlutterFlowTheme.of(context);
+    final hasName = driverName.trim().isNotEmpty;
+    final matricula = (_model.veiculodoc?.matricula ?? '').trim();
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(12.0, 8.0, 12.0, 0.0),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
+        decoration: BoxDecoration(
+          color: theme.secondaryBackground,
+          borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(color: const Color(0xFFD4AF37), width: 1.0),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x55000000),
+              blurRadius: 8.0,
+              offset: Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Image.asset(
+              driveTimeMarkAsset,
+              width: 56.0,
+              height: 56.0,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 12.0),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  RichText(
+                    overflow: TextOverflow.ellipsis,
+                    text: TextSpan(
+                      style: theme.titleSmall.override(
+                        font: GoogleFonts.interTight(
+                            fontWeight: FontWeight.w600),
+                        color: theme.primaryText,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      children: [
+                        TextSpan(text: 'Bem-vindo, '),
+                        TextSpan(
+                          text: hasName ? driverName : '—',
+                          style: TextStyle(
+                            color: const Color(0xFFD4AF37),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 4.0),
+                  Text(
+                    matricula.isNotEmpty ? matricula : '__-__-__',
+                    style: theme.bodyMedium.override(
+                      font: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                      color: const Color(0xFFD4AF37),
+                      fontSize: 13.0,
+                      letterSpacing: 1.4,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _onStopPressed(TurnosRecord turno) async {
@@ -130,7 +214,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
       }
       await stopTurno(fresh);
     } catch (e) {
-      _showShiftSnack('Erro STOP. Tenta novamente.');
+      _showShiftSnack(tr('home.stopError'));
     } finally {
       _shiftBusy = false;
       if (mounted) {
@@ -153,7 +237,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
         // Customize what your widget looks like when it's loading.
         if (!snapshot.hasData) {
           return Scaffold(
-            backgroundColor: Colors.black,
+            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
             body: Center(
               child: SizedBox(
                 width: 50.0,
@@ -183,7 +267,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
           },
           child: Scaffold(
             key: scaffoldKey,
-            backgroundColor: Colors.black,
+            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
             body: SafeArea(
               top: true,
               child: Stack(
@@ -200,7 +284,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                 width: double.infinity,
                                 height: 70.0,
                                 decoration: BoxDecoration(
-                                  color: Color(0xFFC9A227),
+                                  color: Color(0xFFD4AF37),
                                 ),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.max,
@@ -219,7 +303,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                           size: 30.0,
                                         ),
                                         Text(
-                                          'Home',
+                                          tr('nav.home'),
                                           style: FlutterFlowTheme.of(context)
                                               .bodyMedium
                                               .override(
@@ -278,7 +362,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                             size: 30.0,
                                           ),
                                           Text(
-                                            'Historico',
+                                            tr('nav.history'),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -339,7 +423,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                             size: 30.0,
                                           ),
                                           Text(
-                                            'Relatórios',
+                                            tr('nav.reports'),
                                             style: FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .override(
@@ -403,7 +487,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                               size: 30.0,
                                             ),
                                             Text(
-                                              'Definições',
+                                              tr('nav.settings'),
                                               style:
                                                   FlutterFlowTheme.of(context)
                                                       .bodyMedium
@@ -509,7 +593,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                           boxShadow: [
                                             BoxShadow(
                                               blurRadius: 2.0,
-                                              color: Color(0xFFC9A227),
+                                              color: Color(0xFFD4AF37),
                                               offset: Offset(
                                                 2.0,
                                                 2.0,
@@ -547,7 +631,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                               .bodyMedium
                                                               .fontStyle,
                                                     ),
-                                                    color: Color(0xFFC9A227),
+                                                    color: Color(0xFFD4AF37),
                                                     fontSize: 18.0,
                                                     letterSpacing: 1.2,
                                                     fontWeight: FontWeight.bold,
@@ -805,7 +889,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                                     10.0,
                                                               ),
                                                               child: Text(
-                                                                'Regista o teu veículo antes do primeiro turno.',
+                                                                tr('home.registerVehicleFirst'),
                                                                 textAlign:
                                                                     TextAlign
                                                                         .center,
@@ -863,7 +947,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                                       () {});
                                                                 },
                                                                 text:
-                                                                    'Adicionar veículo',
+                                                                    tr('home.addVehicle'),
                                                                 icon: Icon(
                                                                   Icons
                                                                       .directions_car_outlined,
@@ -882,7 +966,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                                     0.0,
                                                                   ),
                                                                   color: Color(
-                                                                      0xFFC9A227),
+                                                                      0xFFD4AF37),
                                                                   textStyle: FlutterFlowTheme.of(
                                                                           context)
                                                                       .titleSmall
@@ -938,6 +1022,8 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                             _model.veiculodoc =
                                                                 activeVeiculo;
 
+                                                            final inicioTurno =
+                                                                getCurrentTimestamp;
                                                             await TurnosRecord
                                                                 .collection
                                                                 .doc()
@@ -948,14 +1034,14 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                                   estado:
                                                                       'ativo',
                                                                   inicioTurno:
-                                                                      getCurrentTimestamp,
+                                                                      inicioTurno,
                                                                   ativo: true,
                                                                   data:
-                                                                      getCurrentTimestamp,
+                                                                      inicioTurno,
                                                                   dataDia:
                                                                       dateTimeFormat(
                                                                     'yyyy-MM-dd',
-                                                                    getCurrentTimestamp,
+                                                                    inicioTurno,
                                                                   ),
                                                                   nomeMotorista:
                                                                       _model
@@ -972,11 +1058,20 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                                           .licencaoperador,
                                                                 ));
 
+                                                            unawaited(
+                                                              NotificationsService
+                                                                  .instance
+                                                                  .scheduleShiftAlerts(
+                                                                inicioTurno:
+                                                                    inicioTurno,
+                                                              ),
+                                                            );
+
                                                             safeSetState(
                                                                 () {});
                                                           },
                                                           text:
-                                                              'Iniciar Turno',
+                                                              tr('home.startShift'),
                                                           options:
                                                               FFButtonOptions(
                                                             width:
@@ -1002,7 +1097,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                               0.0,
                                                             ),
                                                             color: Color(
-                                                                0xFFC9A227),
+                                                                0xFFD4AF37),
                                                             textStyle:
                                                                 FlutterFlowTheme.of(
                                                                         context)
@@ -1104,8 +1199,8 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                             );
                                                           },
                                                           text: showRetomar
-                                                              ? 'RETOMAR'
-                                                              : 'PAUSA',
+                                                              ? tr('home.resume')
+                                                              : tr('home.pause'),
                                                           options:
                                                               FFButtonOptions(
                                                             width:
@@ -1147,7 +1242,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                                     .fontStyle,
                                                               ),
                                                               color: Color(
-                                                                  0xFFC9A227),
+                                                                  0xFFD4AF37),
                                                               letterSpacing:
                                                                   0.0,
                                                               fontWeight:
@@ -1196,7 +1291,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                           containerTurnosRecord,
                                                         );
                                                       },
-                                                      text: 'STOP',
+                                                      text: tr('home.stop'),
                                                       options: FFButtonOptions(
                                                         width: double.infinity,
                                                         height: 40.0,
@@ -1215,7 +1310,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                                     0.0,
                                                                     0.0),
                                                         color:
-                                                            Color(0xFFC9A227),
+                                                            Color(0xFFD4AF37),
                                                         textStyle:
                                                             FlutterFlowTheme.of(
                                                                     context)
@@ -1272,198 +1367,12 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                             Align(
                               alignment: AlignmentDirectional(0.0, -0.97),
                               child: Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  elevation: 16.0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                  ),
-                                  child: Container(
-                                    width: double.infinity,
-                                    height: 73.4,
-                                    decoration: BoxDecoration(
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          blurRadius: 2.0,
-                                          color: Color(0xFFC9A227),
-                                          offset: Offset(
-                                            2.0,
-                                            2.0,
-                                          ),
-                                        )
-                                      ],
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    ),
-                                    child: Align(
-                                      alignment: AlignmentDirectional(0.0, 0.0),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.max,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Align(
-                                            alignment:
-                                                AlignmentDirectional(0.0, 0.0),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.max,
-                                              children: [
-                                                Align(
-                                                  alignment:
-                                                      AlignmentDirectional(
-                                                          0.0, 0.0),
-                                                  child: Padding(
-                                                    padding:
-                                                        EdgeInsets.all(6.0),
-                                                    child: Column(
-                                                      mainAxisSize:
-                                                          MainAxisSize.max,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .end,
-                                                      children: [
-                                                        Align(
-                                                          alignment:
-                                                              AlignmentDirectional(
-                                                                  0.0, -1.0),
-                                                          child: Row(
-                                                            mainAxisSize:
-                                                                MainAxisSize
-                                                                    .max,
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              Align(
-                                                                alignment:
-                                                                    AlignmentDirectional(
-                                                                        0.0,
-                                                                        0.0),
-                                                                child: Padding(
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .all(
-                                                                              18.0),
-                                                                  child: Text(
-                                                                    'Bem Vindo',
-                                                                    style: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .override(
-                                                                      font: GoogleFonts
-                                                                          .inter(
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        fontStyle: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium
-                                                                            .fontStyle,
-                                                                      ),
-                                                                      color: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .primaryText,
-                                                                      fontSize:
-                                                                          18.0,
-                                                                      letterSpacing:
-                                                                          0.0,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontStyle: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium
-                                                                          .fontStyle,
-                                                                      shadows: [
-                                                                        Shadow(
-                                                                          color:
-                                                                              FlutterFlowTheme.of(context).secondaryText,
-                                                                          offset: Offset(
-                                                                              2.0,
-                                                                              2.0),
-                                                                          blurRadius:
-                                                                              2.0,
-                                                                        )
-                                                                      ],
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              Align(
-                                                                alignment:
-                                                                    AlignmentDirectional(
-                                                                        0.0,
-                                                                        0.0),
-                                                                child: Text(
-                                                                  key: ValueKey(
-                                                                      homepageMotoristasRecord!
-                                                                          .nome),
-                                                                  valueOrDefault<
-                                                                      String>(
-                                                                    _model
-                                                                        .motoristadoc
-                                                                        ?.nome,
-                                                                    '______',
-                                                                  ),
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .override(
-                                                                    font: GoogleFonts
-                                                                        .inter(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .bold,
-                                                                      fontStyle: FlutterFlowTheme.of(
-                                                                              context)
-                                                                          .bodyMedium
-                                                                          .fontStyle,
-                                                                    ),
-                                                                    color: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .primaryText,
-                                                                    fontSize:
-                                                                        20.0,
-                                                                    letterSpacing:
-                                                                        0.0,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
-                                                                    fontStyle: FlutterFlowTheme.of(
-                                                                            context)
-                                                                        .bodyMedium
-                                                                        .fontStyle,
-                                                                    shadows: [
-                                                                      Shadow(
-                                                                        color: FlutterFlowTheme.of(context)
-                                                                            .secondaryText,
-                                                                        offset: Offset(
-                                                                            2.0,
-                                                                            2.0),
-                                                                        blurRadius:
-                                                                            2.0,
-                                                                      )
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
+                                padding: const EdgeInsets.fromLTRB(
+                                    16.0, 8.0, 16.0, 8.0),
+                                child: _buildDriverHeader(
+                                  context,
+                                  driverName:
+                                      homepageMotoristasRecord!.nome,
                                 ),
                               ),
                             ),
@@ -1486,7 +1395,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                       boxShadow: [
                                         BoxShadow(
                                           blurRadius: 2.0,
-                                          color: Color(0xFFC9A227),
+                                          color: Color(0xFFD4AF37),
                                           offset: Offset(
                                             2.0,
                                             2.0,
@@ -1555,7 +1464,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                           .bodyMedium
                                                           .fontStyle,
                                                 ),
-                                                color: Color(0xFFC9A227),
+                                                color: Color(0xFFD4AF37),
                                                 fontSize: 20.0,
                                                 letterSpacing: 0.0,
                                                 fontWeight: FontWeight.bold,

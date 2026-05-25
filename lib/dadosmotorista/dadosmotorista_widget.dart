@@ -64,7 +64,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
         // Customize what your widget looks like when it's loading.
         if (!snapshot.hasData) {
           return Scaffold(
-            backgroundColor: Colors.black,
+            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
             body: Center(
               child: SizedBox(
                 width: 50.0,
@@ -96,7 +96,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
           },
           child: Scaffold(
             key: scaffoldKey,
-            backgroundColor: Colors.black,
+            backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
             body: SafeArea(
               top: true,
               child: Align(
@@ -108,14 +108,11 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4.0),
-                        child: Image.asset(
-                          'assets/images/ChatGPT_Image_24_04_2026,_12_09_37.png',
-                          width: 175.6,
-                          height: 181.89,
-                          fit: BoxFit.contain,
-                        ),
+                      Image.asset(
+                        driveTimeTextLogoAsset(context),
+                        width: 220.0,
+                        height: 72.0,
+                        fit: BoxFit.contain,
                       ),
                       GradientText(
                         'Dados do Motorista',
@@ -127,7 +124,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                     .bodyMedium
                                     .fontStyle,
                               ),
-                              color: Color(0xFFC9A227),
+                              color: Color(0xFFD4AF37),
                               fontSize: 30.0,
                               letterSpacing: 0.0,
                               fontWeight: FontWeight.w800,
@@ -137,7 +134,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                             ),
                         colors: [
                           FlutterFlowTheme.of(context).secondaryBackground,
-                          Color(0xFFC9A227)
+                          Color(0xFFD4AF37)
                         ],
                         gradientDirection: GradientDirection.ltr,
                         gradientType: GradientType.linear,
@@ -173,7 +170,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                                   .labelMedium
                                                   .fontStyle,
                                         ),
-                                        color: Color(0xFFC9A227),
+                                        color: Color(0xFFD4AF37),
                                         fontSize: 16.0,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.bold,
@@ -284,7 +281,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                                   .labelMedium
                                                   .fontStyle,
                                         ),
-                                        color: Color(0xFFC9A227),
+                                        color: Color(0xFFD4AF37),
                                         fontSize: 16.0,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.bold,
@@ -396,7 +393,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                                   .labelMedium
                                                   .fontStyle,
                                         ),
-                                        color: Color(0xFFC9A227),
+                                        color: Color(0xFFD4AF37),
                                         fontSize: 16.0,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.bold,
@@ -512,7 +509,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                                   .labelMedium
                                                   .fontStyle,
                                         ),
-                                        color: Color(0xFFC9A227),
+                                        color: Color(0xFFD4AF37),
                                         fontSize: 16.0,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.bold,
@@ -627,7 +624,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                                   .labelMedium
                                                   .fontStyle,
                                         ),
-                                        color: Color(0xFFC9A227),
+                                        color: Color(0xFFD4AF37),
                                         fontSize: 16.0,
                                         letterSpacing: 0.0,
                                         fontWeight: FontWeight.bold,
@@ -739,7 +736,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                   padding: EdgeInsets.all(12.0),
                                   iconPadding: EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 0.0),
-                                  color: Color(0xFFC9A227),
+                                  color: Color(0xFFD4AF37),
                                   textStyle: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
@@ -784,7 +781,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                       16.0, 0.0, 16.0, 0.0),
                                   iconPadding: EdgeInsetsDirectional.fromSTEB(
                                       0.0, 0.0, 0.0, 0.0),
-                                  color: Color(0xFFC9A227),
+                                  color: Color(0xFFD4AF37),
                                   textStyle: FlutterFlowTheme.of(context)
                                       .titleSmall
                                       .override(

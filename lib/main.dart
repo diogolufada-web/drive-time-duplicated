@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +11,7 @@ import 'auth/firebase_auth/auth_util.dart';
 import 'backend/firebase/firebase_config.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import 'flutter_flow/flutter_flow_util.dart';
+import 'services/notifications_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +21,10 @@ void main() async {
   await initFirebase();
 
   await FlutterFlowTheme.initialize();
+  await FFLocalizations.initialize();
+  await NotificationsService.instance.init();
+  // Pede permissão sem bloquear; em web isto é no-op.
+  unawaited(NotificationsService.instance.requestPermissionsIfNeeded());
 
   runApp(MyApp());
 }
@@ -41,6 +48,7 @@ class MyAppScrollBehavior extends MaterialScrollBehavior {
 
 class _MyAppState extends State<MyApp> {
   ThemeMode _themeMode = FlutterFlowTheme.themeMode;
+  Locale _locale = FFLocalizations.locale;
 
   late AppStateNotifier _appStateNotifier;
   late GoRouter _router;
@@ -81,18 +89,24 @@ class _MyAppState extends State<MyApp> {
         FlutterFlowTheme.saveThemeMode(mode);
       });
 
+  Future<void> setLocale(Locale locale) async {
+    await FFLocalizations.setLocale(locale.languageCode);
+    safeSetState(() => _locale = FFLocalizations.locale);
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'drive time duplicated',
       scrollBehavior: MyAppScrollBehavior(),
-      localizationsDelegates: [
+      locale: _locale,
+      localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: const [Locale('en', '')],
+      supportedLocales: FFLocalizations.supportedLocales,
       theme: ThemeData(
         brightness: Brightness.light,
         useMaterial3: false,

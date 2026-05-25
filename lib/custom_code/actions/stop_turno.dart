@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '/auth/firebase_auth/auth_util.dart';
+import '/flutter_flow/internationalization.dart';
+import '/services/notifications_service.dart';
 
 void _showSnack(String message) {
   debugPrint('stopTurno: $message');
@@ -41,11 +43,11 @@ Future<List<PausasRecord>> _activePausasForTurno(
 /// Parâmetro FlutterFlow: [turno] = Document (Turnos Record), ex. containerTurnosRecord
 Future<void> stopTurno(TurnosRecord? turno) async {
   if (turno == null) {
-    _showSnack('Sem turno activo.');
+    _showSnack(tr('shift.noActive'));
     return;
   }
   if (currentUserEmail.isEmpty) {
-    _showSnack('Utilizador não autenticado.');
+    _showSnack(tr('shift.notAuthenticated'));
     return;
   }
 
@@ -54,11 +56,11 @@ Future<void> stopTurno(TurnosRecord? turno) async {
   try {
     final fresh = await TurnosRecord.getDocumentOnce(turnoRef);
     if (!fresh.ativo) {
-      _showSnack('Este turno já não está activo.');
+      _showSnack(tr('home.shiftInactive'));
       return;
     }
     if (fresh.email.isNotEmpty && fresh.email != currentUserEmail) {
-      _showSnack('Turno não pertence a este utilizador.');
+      _showSnack(tr('shift.notOwner'));
       return;
     }
 
@@ -81,9 +83,10 @@ Future<void> stopTurno(TurnosRecord? turno) async {
       ),
     );
     await batch.commit();
-    _showSnack('Turno terminado.');
+    await NotificationsService.instance.cancelShiftAlerts();
+    _showSnack(tr('shift.stopped'));
   } catch (e, st) {
     debugPrint('stopTurno error: $e\n$st');
-    _showSnack('Erro ao terminar turno. Tenta novamente.');
+    _showSnack(tr('shift.stopFailed'));
   }
 }
