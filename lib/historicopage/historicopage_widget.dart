@@ -3,6 +3,7 @@ import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
+import '/utils/shift_time.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'historicopage_model.dart';
@@ -57,53 +58,67 @@ class _HistoricopageWidgetState extends State<HistoricopageWidget> {
           child: Column(
             children: [
               Expanded(
-                child: StreamBuilder<List<TurnosRecord>>(
-                  stream: queryTurnosRecord(
+                child: StreamBuilder<List<PausasRecord>>(
+                  stream: queryPausasRecord(
                     queryBuilder: (q) => q
                         .where('email', isEqualTo: currentUserEmail)
-                        .where('inicio_turno',
+                        .where('inicio_pausa',
                             isGreaterThanOrEqualTo: startOfWindow),
                   ),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const Center(
-                        child: SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(_accent),
-                          ),
-                        ),
-                      );
-                    }
-                    final turnos = snapshot.data!;
-                    final perDay = _groupByDay(turnos, startOfToday);
-                    final totalSeconds = perDay.values
-                        .fold<int>(0, (sum, d) => sum + d.totalSeconds);
-                    final totalShifts = perDay.values
-                        .fold<int>(0, (sum, d) => sum + d.shifts);
-                    return ListView(
-                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-                      children: [
-                        _buildHeader(theme),
-                        const SizedBox(height: 16),
-                        _buildWeekTotalCard(
-                          theme,
-                          totalSeconds: totalSeconds,
-                          totalShifts: totalShifts,
-                        ),
-                        const SizedBox(height: 20),
-                        for (int i = 0; i < 7; i++)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: _buildDayCard(
-                              theme,
-                              day: startOfToday.subtract(Duration(days: i)),
-                              info: perDay[_dayKey(
-                                  startOfToday.subtract(Duration(days: i)))],
+                  builder: (context, pausasSnapshot) {
+                    final pausas = pausasSnapshot.data ?? <PausasRecord>[];
+                    return StreamBuilder<List<TurnosRecord>>(
+                      stream: queryTurnosRecord(
+                        queryBuilder: (q) => q
+                            .where('email', isEqualTo: currentUserEmail)
+                            .where('inicio_turno',
+                                isGreaterThanOrEqualTo: startOfWindow),
+                      ),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const Center(
+                            child: SizedBox(
+                              width: 40,
+                              height: 40,
+                              child: CircularProgressIndicator(
+                                valueColor:
+                                    AlwaysStoppedAnimation<Color>(_accent),
+                              ),
                             ),
-                          ),
-                      ],
+                          );
+                        }
+                        final turnos = snapshot.data!;
+                        final perDay =
+                            _groupByDay(turnos, pausas, startOfToday);
+                        final totalSeconds = perDay.values
+                            .fold<int>(0, (sum, d) => sum + d.totalSeconds);
+                        final totalShifts = perDay.values
+                            .fold<int>(0, (sum, d) => sum + d.shifts);
+                        return ListView(
+                          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                          children: [
+                            _buildHeader(theme),
+                            const SizedBox(height: 16),
+                            _buildWeekTotalCard(
+                              theme,
+                              totalSeconds: totalSeconds,
+                              totalShifts: totalShifts,
+                            ),
+                            const SizedBox(height: 20),
+                            for (int i = 0; i < 7; i++)
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: _buildDayCard(
+                                  theme,
+                                  day:
+                                      startOfToday.subtract(Duration(days: i)),
+                                  info: perDay[_dayKey(startOfToday
+                                      .subtract(Duration(days: i)))],
+                                ),
+                              ),
+                          ],
+                        );
+                      },
                     );
                   },
                 ),
@@ -118,6 +133,7 @@ class _HistoricopageWidgetState extends State<HistoricopageWidget> {
 
   Map<String, _DaySummary> _groupByDay(
     List<TurnosRecord> turnos,
+    List<PausasRecord> pausas,
     DateTime startOfToday,
   ) {
     final map = <String, _DaySummary>{};
@@ -131,20 +147,10 @@ class _HistoricopageWidgetState extends State<HistoricopageWidget> {
       final key = _dayKey(dayStart);
       final existing = map[key] ?? _DaySummary(date: dayStart);
       existing.shifts += 1;
-      existing.totalSeconds += _resolveDurationSeconds(t);
+      existing.totalSeconds += effectiveShiftSeconds(t, pausas);
       map[key] = existing;
     }
     return map;
-  }
-
-  int _resolveDurationSeconds(TurnosRecord t) {
-    if (t.duracaoSegundos > 0) return t.duracaoSegundos;
-    final start = t.inicioTurno;
-    final end = t.fimTurno;
-    if (start != null && end != null && end.isAfter(start)) {
-      return end.difference(start).inSeconds;
-    }
-    return 0;
   }
 
   String _dayKey(DateTime d) =>
@@ -160,7 +166,6 @@ class _HistoricopageWidgetState extends State<HistoricopageWidget> {
   String _dayLabel(DateTime day, DateTime startOfToday) {
     final diff = startOfToday.difference(day).inDays;
     if (diff == 0) return tr('history.today');
-    if (diff == 1) return tr('history.yesterday');
     return tr('weekday.${day.weekday}');
   }
 
@@ -170,23 +175,9 @@ class _HistoricopageWidgetState extends State<HistoricopageWidget> {
   Widget _buildHeader(FlutterFlowTheme theme) {
     return Column(
       children: [
-        Image.asset(
-          driveTimeTextLogoAsset(context),
-          width: 200,
-          height: 64,
-          fit: BoxFit.contain,
-        ),
-        const SizedBox(height: 10),
-        Text(
-          tr('history.weekly'),
-          style: theme.titleLarge.override(
-            font: GoogleFonts.interTight(fontWeight: FontWeight.bold),
-            color: _accent,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.4,
-          ),
-        ),
+        dtTextLogo(context),
+        const SizedBox(height: 12),
+        dtSectionTitle(context, tr('history.weekly'), fontSize: 32),
       ],
     );
   }
@@ -202,21 +193,7 @@ class _HistoricopageWidgetState extends State<HistoricopageWidget> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFD4AF37), Color(0xFFB8860B)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-            blurRadius: 10,
-            color: Color(0x55000000),
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
+      decoration: dtGoldCardDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -265,16 +242,7 @@ class _HistoricopageWidgetState extends State<HistoricopageWidget> {
     final hasData = info != null && info.totalSeconds > 0;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-      decoration: BoxDecoration(
-        color: theme.secondaryBackground,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: hasData
-              ? _accent.withOpacity(0.6)
-              : theme.alternate.withOpacity(0.4),
-          width: 1.2,
-        ),
-      ),
+      decoration: dtCardDecoration(context),
       child: Row(
         children: [
           Container(

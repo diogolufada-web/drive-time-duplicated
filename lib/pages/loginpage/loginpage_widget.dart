@@ -65,9 +65,8 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
                   borderRadius: BorderRadius.circular(12.0),
                   child: Image.asset(
                     driveTimeLogoAsset(context),
-                    width: 380.1,
-                    height: 317.67,
-                    fit: BoxFit.cover,
+                    height: 200.0,
+                    fit: BoxFit.contain,
                     alignment: Alignment(0.0, 0.0),
                   ),
                 ),

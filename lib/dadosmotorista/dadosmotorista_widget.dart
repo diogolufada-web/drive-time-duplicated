@@ -6,7 +6,6 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import '/index.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:simple_gradient_text/simple_gradient_text.dart';
 import 'dadosmotorista_model.dart';
 export 'dadosmotorista_model.dart';
 
@@ -108,43 +107,24 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
                     children: [
-                      Image.asset(
-                        driveTimeLogoAsset(context),
-                        width: 180.0,
-                        height: 180.0,
-                        fit: BoxFit.contain,
-                      ),
-                      GradientText(
-                        'Dados do Motorista',
-                        textAlign: TextAlign.center,
-                        style: FlutterFlowTheme.of(context).bodyMedium.override(
-                              font: GoogleFonts.inter(
-                                fontWeight: FontWeight.w800,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .bodyMedium
-                                    .fontStyle,
-                              ),
-                              color: Color(0xFFD4AF37),
-                              fontSize: 30.0,
-                              letterSpacing: 0.0,
-                              fontWeight: FontWeight.w800,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .bodyMedium
-                                  .fontStyle,
-                            ),
-                        colors: [
-                          FlutterFlowTheme.of(context).secondaryBackground,
-                          Color(0xFFD4AF37)
-                        ],
-                        gradientDirection: GradientDirection.ltr,
-                        gradientType: GradientType.linear,
+                      dtTextLogo(context),
+                      const SizedBox(height: 12.0),
+                      dtSectionTitle(
+                        context,
+                        tr('form.driverTitle'),
+                        fontSize: 32,
                       ),
                       Padding(
-                        padding: EdgeInsets.all(20.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 4.0, vertical: 18.0),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 18.0),
+                          decoration: dtCardDecoration(context),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
                             Container(
                               width: double.infinity,
                               child: TextFormField(
@@ -159,7 +139,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   isDense: true,
-                                  labelText: 'Nome',
+                                  labelText: tr('form.name'),
                                   labelStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
@@ -178,7 +158,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                             .labelMedium
                                             .fontStyle,
                                       ),
-                                  hintText: 'Inserir Nome completo',
+                                  hintText: tr('form.nameHint'),
                                   hintStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
@@ -204,17 +184,18 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
-                                      width: 1.0,
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      width: 1.2,
                                     ),
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
-                                      width: 1.0,
+                                      color: const Color(0xFFD4AF37),
+                                      width: 1.8,
                                     ),
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   errorBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -232,7 +213,10 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                   ),
                                   filled: true,
                                   fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                      .primaryBackground,
+                                  contentPadding:
+                                      const EdgeInsets.symmetric(
+                                          horizontal: 14.0, vertical: 14.0),
                                 ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
@@ -270,7 +254,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   isDense: true,
-                                  labelText: 'EMAIL',
+                                  labelText: tr('form.email'),
                                   labelStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
@@ -289,7 +273,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                             .labelMedium
                                             .fontStyle,
                                       ),
-                                  hintText: 'exemplo@email.com',
+                                  hintText: tr('form.emailHint'),
                                   hintStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
@@ -315,17 +299,18 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
-                                      width: 1.0,
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      width: 1.2,
                                     ),
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
-                                      width: 1.0,
+                                      color: const Color(0xFFD4AF37),
+                                      width: 1.8,
                                     ),
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   errorBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -343,7 +328,10 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                   ),
                                   filled: true,
                                   fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                      .primaryBackground,
+                                  contentPadding:
+                                      const EdgeInsets.symmetric(
+                                          horizontal: 14.0, vertical: 14.0),
                                 ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
@@ -382,7 +370,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   isDense: true,
-                                  labelText: 'TELEFONE',
+                                  labelText: tr('form.phone'),
                                   labelStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
@@ -401,7 +389,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                             .labelMedium
                                             .fontStyle,
                                       ),
-                                  hintText: '910000000',
+                                  hintText: tr('form.phoneHint'),
                                   hintStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
@@ -427,17 +415,18 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
-                                      width: 1.0,
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      width: 1.2,
                                     ),
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
-                                      width: 1.0,
+                                      color: const Color(0xFFD4AF37),
+                                      width: 1.8,
                                     ),
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   errorBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -455,7 +444,10 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                   ),
                                   filled: true,
                                   fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                      .primaryBackground,
+                                  contentPadding:
+                                      const EdgeInsets.symmetric(
+                                          horizontal: 14.0, vertical: 14.0),
                                 ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
@@ -498,7 +490,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   isDense: true,
-                                  labelText: 'Certificado CMTVDE',
+                                  labelText: tr('form.certificate'),
                                   labelStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
@@ -517,7 +509,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                             .labelMedium
                                             .fontStyle,
                                       ),
-                                  hintText: 'Número do certificado',
+                                  hintText: tr('form.certificateHint'),
                                   hintStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
@@ -543,17 +535,18 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
-                                      width: 1.0,
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      width: 1.2,
                                     ),
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
-                                      width: 1.0,
+                                      color: const Color(0xFFD4AF37),
+                                      width: 1.8,
                                     ),
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   errorBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -571,7 +564,10 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                   ),
                                   filled: true,
                                   fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                      .primaryBackground,
+                                  contentPadding:
+                                      const EdgeInsets.symmetric(
+                                          horizontal: 14.0, vertical: 14.0),
                                 ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
@@ -613,7 +609,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                 obscureText: false,
                                 decoration: InputDecoration(
                                   isDense: true,
-                                  labelText: 'NIF',
+                                  labelText: tr('form.nif'),
                                   labelStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
@@ -632,7 +628,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                             .labelMedium
                                             .fontStyle,
                                       ),
-                                  hintText: 'Nº de Identificação Fiscal',
+                                  hintText: tr('form.nifHint'),
                                   hintStyle: FlutterFlowTheme.of(context)
                                       .labelMedium
                                       .override(
@@ -658,17 +654,18 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
-                                      width: 1.0,
+                                      color: FlutterFlowTheme.of(context)
+                                          .alternate,
+                                      width: 1.2,
                                     ),
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
-                                      width: 1.0,
+                                      color: const Color(0xFFD4AF37),
+                                      width: 1.8,
                                     ),
-                                    borderRadius: BorderRadius.circular(8.0),
+                                    borderRadius: BorderRadius.circular(10.0),
                                   ),
                                   errorBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -686,7 +683,10 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                   ),
                                   filled: true,
                                   fillColor: FlutterFlowTheme.of(context)
-                                      .secondaryBackground,
+                                      .primaryBackground,
+                                  contentPadding:
+                                      const EdgeInsets.symmetric(
+                                          horizontal: 14.0, vertical: 14.0),
                                 ),
                                 style: FlutterFlowTheme.of(context)
                                     .bodyMedium
@@ -729,7 +729,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                     nif: _model.textController5.text,
                                   ));
                                 },
-                                text: 'Guardar',
+                                text: tr('form.save'),
                                 options: FFButtonOptions(
                                   width: 179.2,
                                   height: 40.0,
@@ -773,7 +773,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                 onPressed: () async {
                                   context.pushNamed(HomepageWidget.routeName);
                                 },
-                                text: 'Menu principal',
+                                text: tr('form.mainMenu'),
                                 options: FFButtonOptions(
                                   width: double.infinity,
                                   height: 48.5,
@@ -816,9 +816,10 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                 ),
                               ),
                             ),
-                          ]
-                              .divide(SizedBox(height: 12.0))
-                              .around(SizedBox(height: 12.0)),
+                            ]
+                                .divide(SizedBox(height: 12.0))
+                                .around(SizedBox(height: 12.0)),
+                          ),
                         ),
                       ),
                     ],

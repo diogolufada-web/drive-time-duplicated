@@ -245,4 +245,79 @@ const Map<String, Map<String, String>> _kTranslations = {
     'pt': 'Lembrete: termina o teu turno antes de ir dormir.',
     'en': 'Reminder: end your shift before going to bed.',
   },
+
+  // Homepage extra strings
+  'home.welcome': {'pt': 'Bem-vindo', 'en': 'Welcome'},
+  'home.hoursToday': {
+    'pt': 'Horas Trabalhadas Hoje',
+    'en': 'Hours Worked Today',
+  },
+
+  // Settings extra
+  'settings.account': {'pt': 'Conta', 'en': 'Account'},
+  'settings.driverData': {'pt': 'Dados do motorista', 'en': 'Driver data'},
+  'settings.vehicleData': {'pt': 'Dados do veículo', 'en': 'Vehicle data'},
+
+  // Driver / Vehicle forms
+  'form.driverTitle': {'pt': 'Dados do Motorista', 'en': 'Driver Data'},
+  'form.vehicleTitle': {'pt': 'Dados do Veículo', 'en': 'Vehicle Data'},
+
+  'form.name': {'pt': 'Nome', 'en': 'Name'},
+  'form.nameHint': {'pt': 'Introduz o teu nome', 'en': 'Enter your name'},
+
+  'form.email': {'pt': 'Email', 'en': 'Email'},
+  'form.emailHint': {'pt': 'Introduz o teu email', 'en': 'Enter your email'},
+
+  'form.phone': {'pt': 'Telefone', 'en': 'Phone'},
+  'form.phoneHint': {
+    'pt': 'Introduz o teu telefone',
+    'en': 'Enter your phone number',
+  },
+
+  'form.certificate': {
+    'pt': 'Certificado de motorista',
+    'en': 'Driver certificate',
+  },
+  'form.certificateHint': {
+    'pt': 'Número do certificado',
+    'en': 'Certificate number',
+  },
+
+  'form.nif': {'pt': 'NIF', 'en': 'Tax ID'},
+  'form.nifHint': {'pt': 'Introduz o NIF', 'en': 'Enter Tax ID'},
+
+  'form.plate': {'pt': 'Matrícula', 'en': 'Plate'},
+  'form.plateHint': {'pt': 'Introduz a matrícula', 'en': 'Enter the plate'},
+
+  'form.brand': {'pt': 'Marca', 'en': 'Brand'},
+  'form.brandHint': {
+    'pt': 'Introduz a marca do veículo',
+    'en': 'Enter the vehicle brand',
+  },
+
+  'form.year': {'pt': 'Ano', 'en': 'Year'},
+  'form.yearHint': {'pt': '2025', 'en': '2025'},
+
+  'form.color': {'pt': 'Cor', 'en': 'Color'},
+  'form.colorHint': {
+    'pt': 'Introduz a cor do veículo',
+    'en': 'Enter the vehicle color',
+  },
+
+  'form.operatorLicense': {
+    'pt': 'Licença do Operador',
+    'en': 'Operator License',
+  },
+  'form.operatorLicenseHint': {
+    'pt': 'Introduz a licença do operador',
+    'en': 'Enter the operator license',
+  },
+
+  'form.save': {'pt': 'Guardar', 'en': 'Save'},
+  'form.mainMenu': {'pt': 'Menu principal', 'en': 'Main menu'},
+  'form.saved': {'pt': 'Dados guardados.', 'en': 'Data saved.'},
+  'form.saveError': {
+    'pt': 'Erro ao guardar. Tenta novamente.',
+    'en': 'Error saving. Try again.',
+  },
 };

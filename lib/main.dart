@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'auth/firebase_auth/firebase_user_provider.dart';
 import 'auth/firebase_auth/auth_util.dart';
 
@@ -22,6 +23,8 @@ void main() async {
 
   await FlutterFlowTheme.initialize();
   await FFLocalizations.initialize();
+  await initializeDateFormatting('pt', null);
+  await initializeDateFormatting('en', null);
   await NotificationsService.instance.init();
   // Pede permissão sem bloquear; em web isto é no-op.
   unawaited(NotificationsService.instance.requestPermissionsIfNeeded());

@@ -81,9 +81,8 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                   borderRadius: BorderRadius.circular(0.0),
                   child: Image.asset(
                     driveTimeLogoAsset(context),
-                    width: 200.0,
-                    height: 181.19,
-                    fit: BoxFit.cover,
+                    height: 160.0,
+                    fit: BoxFit.contain,
                     alignment: Alignment(0.0, 0.0),
                   ),
                 ),

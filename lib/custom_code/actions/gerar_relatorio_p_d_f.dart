@@ -13,6 +13,8 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'dart:typed_data';
 
+import '/utils/shift_time.dart';
+
 const PdfColor _gold = PdfColor.fromInt(0xFFD4AF37);
 const PdfColor _goldSoft = PdfColor.fromInt(0xFFFFF6D6);
 const PdfColor _darkGrey = PdfColor.fromInt(0xFF1A1A1A);
@@ -21,45 +23,45 @@ const PdfColor _lineGrey = PdfColor.fromInt(0xFFE5E5E5);
 
 Future<void> gerarRelatorioPDF(
   List<TurnosRecord>? turnos,
-  List<PausasRecord>? pausas,
-) async {
+  List<PausasRecord>? pausas, {
+  MotoristasRecord? motorista,
+  VeiculosRecord? veiculo,
+}) async {
   final pdf = pw.Document();
   final safeTurnos = (turnos ?? []).where((t) => t.inicioTurno != null).toList()
     ..sort((a, b) => b.inicioTurno!.compareTo(a.inicioTurno!));
-  final safePausas = pausas ?? [];
+  final safePausas = pausas ?? <PausasRecord>[];
 
   final totalSeconds = safeTurnos.fold<int>(
     0,
-    (sum, t) => sum + _shiftSeconds(t),
+    (sum, t) => sum + effectiveShiftSeconds(t, safePausas),
   );
   final completedShifts = safeTurnos.where((t) => t.fimTurno != null).length;
   final periodLabel = _periodLabel(safeTurnos);
-  final motorista =
-      safeTurnos.isNotEmpty ? (safeTurnos.first.nomeMotorista) : '';
+  final motoristaHeader = motorista?.nome.isNotEmpty == true
+      ? motorista!.nome
+      : (safeTurnos.isNotEmpty ? safeTurnos.first.nomeMotorista : '');
   final matriculaSet = <String>{
     for (final t in safeTurnos)
       if (t.matricula.isNotEmpty) t.matricula,
   };
+  if (veiculo != null && veiculo.matricula.isNotEmpty) {
+    matriculaSet.add(veiculo.matricula);
+  }
   final matriculaLabel =
       matriculaSet.isEmpty ? '-' : matriculaSet.join(', ');
-
-  final pausasByShiftKey = <String, List<PausasRecord>>{};
-  for (final p in safePausas) {
-    final key = p.dataDia.isNotEmpty
-        ? p.dataDia
-        : (p.inicioPausa != null ? _dayKey(p.inicioPausa!) : '');
-    if (key.isEmpty) continue;
-    pausasByShiftKey.putIfAbsent(key, () => []).add(p);
-  }
 
   pdf.addPage(
     pw.MultiPage(
       pageFormat: PdfPageFormat.a4,
       margin: const pw.EdgeInsets.fromLTRB(32, 36, 32, 40),
-      header: (ctx) => _header(motorista: motorista, matricula: matriculaLabel),
+      header: (ctx) =>
+          _header(motorista: motoristaHeader, matricula: matriculaLabel),
       footer: (ctx) => _footer(ctx),
       build: (pw.Context context) {
         return [
+          _driverInfoCard(m: motorista, v: veiculo),
+          pw.SizedBox(height: 14),
           _summaryCard(
             periodLabel: periodLabel,
             totalSeconds: totalSeconds,
@@ -69,11 +71,11 @@ Future<void> gerarRelatorioPDF(
           pw.SizedBox(height: 18),
           _sectionTitle('Resumo diário'),
           pw.SizedBox(height: 6),
-          _dailyBreakdownTable(safeTurnos),
+          _dailyBreakdownTable(safeTurnos, safePausas),
           pw.SizedBox(height: 18),
           _sectionTitle('Detalhe de turnos'),
           pw.SizedBox(height: 6),
-          _shiftsTable(safeTurnos, pausasByShiftKey),
+          _shiftsTable(safeTurnos, safePausas),
           if (safePausas.isNotEmpty) ...[
             pw.SizedBox(height: 18),
             _sectionTitle('Pausas registadas'),
@@ -104,16 +106,6 @@ Future<void> gerarRelatorioPDF(
   );
 }
 
-int _shiftSeconds(TurnosRecord t) {
-  if (t.duracaoSegundos > 0) return t.duracaoSegundos;
-  final start = t.inicioTurno;
-  final end = t.fimTurno;
-  if (start != null && end != null && end.isAfter(start)) {
-    return end.difference(start).inSeconds;
-  }
-  return 0;
-}
-
 String _dayKey(DateTime d) =>
     '${d.day.toString().padLeft(2, '0')}-${d.month.toString().padLeft(2, '0')}-${d.year}';
 
@@ -136,12 +128,7 @@ String _formatDateTime(DateTime dt) {
   return '${_formatDate(dt)} ${_formatTime(dt)}';
 }
 
-String _formatDuration(int seconds) {
-  if (seconds <= 0) return '0h 00m';
-  final h = seconds ~/ 3600;
-  final m = (seconds % 3600) ~/ 60;
-  return '${h}h ${m.toString().padLeft(2, '0')}m';
-}
+String _formatDuration(int seconds) => formatHM(seconds);
 
 String _periodLabel(List<TurnosRecord> turnos) {
   if (turnos.isEmpty) return 'Sem dados';
@@ -150,6 +137,12 @@ String _periodLabel(List<TurnosRecord> turnos) {
       .toList()
     ..sort();
   return '${_formatDate(dates.first)} – ${_formatDate(dates.last)}';
+}
+
+String _fallback(String? value) {
+  if (value == null) return '—';
+  final trimmed = value.trim();
+  return trimmed.isEmpty ? '—' : trimmed;
 }
 
 pw.Widget _header({required String motorista, required String matricula}) {
@@ -249,6 +242,102 @@ pw.Widget _sectionTitle(String title) {
   );
 }
 
+pw.Widget _driverInfoCard({
+  required MotoristasRecord? m,
+  required VeiculosRecord? v,
+}) {
+  return pw.Container(
+    padding: const pw.EdgeInsets.all(12),
+    decoration: pw.BoxDecoration(
+      color: _goldSoft,
+      borderRadius: pw.BorderRadius.circular(6),
+      border: pw.Border.all(color: _gold, width: 1.0),
+    ),
+    child: pw.Row(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        pw.Expanded(
+          child: _infoColumn(
+            title: 'Motorista',
+            rows: [
+              ('Nome', _fallback(m?.nome)),
+              ('NIF', _fallback(m?.nif)),
+              ('Telefone', _fallback(m?.telefone)),
+              ('Certificado CMTVDE', _fallback(m?.certeficadocmtvde)),
+              ('Carta de condução', _fallback(m?.cartadeconducao)),
+              ('Email', _fallback(m?.email)),
+            ],
+          ),
+        ),
+        pw.Container(
+          width: 1,
+          margin: const pw.EdgeInsets.symmetric(horizontal: 12),
+          color: _gold,
+        ),
+        pw.Expanded(
+          child: _infoColumn(
+            title: 'Veículo',
+            rows: [
+              ('Matrícula', _fallback(v?.matricula)),
+              ('Marca', _fallback(v?.marca)),
+              ('Ano', _fallback(v?.ano)),
+              ('Cor', _fallback(v?.cor)),
+              ('Licença operador', _fallback(v?.licencaoperador)),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+pw.Widget _infoColumn({
+  required String title,
+  required List<(String, String)> rows,
+}) {
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.start,
+    children: [
+      pw.Text(
+        title.toUpperCase(),
+        style: pw.TextStyle(
+          fontSize: 9,
+          fontWeight: pw.FontWeight.bold,
+          color: _gold,
+          letterSpacing: 0.8,
+        ),
+      ),
+      pw.SizedBox(height: 6),
+      for (final r in rows) ...[
+        pw.Padding(
+          padding: const pw.EdgeInsets.only(bottom: 2),
+          child: pw.RichText(
+            text: pw.TextSpan(
+              children: [
+                pw.TextSpan(
+                  text: '${r.$1}: ',
+                  style: pw.TextStyle(
+                    fontSize: 9,
+                    fontWeight: pw.FontWeight.bold,
+                    color: _gold,
+                  ),
+                ),
+                pw.TextSpan(
+                  text: r.$2,
+                  style: pw.TextStyle(
+                    fontSize: 9,
+                    color: _darkGrey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ],
+  );
+}
+
 pw.Widget _summaryCard({
   required String periodLabel,
   required int totalSeconds,
@@ -312,7 +401,10 @@ pw.Widget _vDivider() => pw.Container(
       margin: const pw.EdgeInsets.symmetric(horizontal: 12),
     );
 
-pw.Widget _dailyBreakdownTable(List<TurnosRecord> turnos) {
+pw.Widget _dailyBreakdownTable(
+  List<TurnosRecord> turnos,
+  List<PausasRecord> pausas,
+) {
   final byDay = <String, _DayAgg>{};
   for (final t in turnos) {
     final dt = t.inicioTurno;
@@ -320,7 +412,10 @@ pw.Widget _dailyBreakdownTable(List<TurnosRecord> turnos) {
     final key = _dayKey(dt);
     final agg = byDay[key] ?? _DayAgg(date: dt);
     agg.shifts += 1;
-    agg.seconds += _shiftSeconds(t);
+    agg.seconds += effectiveShiftSeconds(t, pausas);
+    if (t.matricula.isNotEmpty) {
+      agg.matriculas.add(t.matricula);
+    }
     byDay[key] = agg;
   }
   final sorted = byDay.values.toList()
@@ -330,10 +425,11 @@ pw.Widget _dailyBreakdownTable(List<TurnosRecord> turnos) {
         style: pw.TextStyle(fontSize: 10, color: _midGrey));
   }
   return pw.Table.fromTextArray(
-    headers: ['Data', 'Turnos', 'Total'],
+    headers: ['Data', 'Matrícula', 'Turnos', 'Total'],
     data: sorted
         .map((d) => [
               _formatDate(d.date),
+              d.matriculas.isEmpty ? '-' : d.matriculas.join(', '),
               d.shifts.toString(),
               _formatDuration(d.seconds),
             ])
@@ -345,17 +441,19 @@ pw.Widget _dailyBreakdownTable(List<TurnosRecord> turnos) {
     ),
     headerDecoration: const pw.BoxDecoration(color: _darkGrey),
     cellStyle: pw.TextStyle(fontSize: 9, color: _darkGrey),
-    rowDecoration:
-        const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(color: _lineGrey, width: 0.4))),
+    rowDecoration: const pw.BoxDecoration(
+        border: pw.Border(bottom: pw.BorderSide(color: _lineGrey, width: 0.4))),
     cellAlignments: const {
       0: pw.Alignment.centerLeft,
-      1: pw.Alignment.center,
-      2: pw.Alignment.centerRight,
+      1: pw.Alignment.centerLeft,
+      2: pw.Alignment.center,
+      3: pw.Alignment.centerRight,
     },
     columnWidths: const {
       0: pw.FlexColumnWidth(2),
-      1: pw.FlexColumnWidth(1),
-      2: pw.FlexColumnWidth(1.5),
+      1: pw.FlexColumnWidth(2),
+      2: pw.FlexColumnWidth(1),
+      3: pw.FlexColumnWidth(1.5),
     },
     cellPadding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 5),
   );
@@ -363,7 +461,7 @@ pw.Widget _dailyBreakdownTable(List<TurnosRecord> turnos) {
 
 pw.Widget _shiftsTable(
   List<TurnosRecord> turnos,
-  Map<String, List<PausasRecord>> pausasByDay,
+  List<PausasRecord> pausas,
 ) {
   if (turnos.isEmpty) {
     return pw.Text('Sem turnos no período.',
@@ -382,7 +480,7 @@ pw.Widget _shiftsTable(
         _formatTime(t.fimTurno),
         estado,
         matricula,
-        _formatDuration(_shiftSeconds(t)),
+        _formatDuration(effectiveShiftSeconds(t, pausas)),
       ];
     }).toList(),
     headerStyle: pw.TextStyle(
@@ -392,8 +490,8 @@ pw.Widget _shiftsTable(
     ),
     headerDecoration: const pw.BoxDecoration(color: _darkGrey),
     cellStyle: pw.TextStyle(fontSize: 9, color: _darkGrey),
-    rowDecoration:
-        const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(color: _lineGrey, width: 0.4))),
+    rowDecoration: const pw.BoxDecoration(
+        border: pw.Border(bottom: pw.BorderSide(color: _lineGrey, width: 0.4))),
     cellAlignments: const {
       0: pw.Alignment.centerLeft,
       1: pw.Alignment.center,
@@ -423,8 +521,8 @@ pw.Widget _pausasTable(List<PausasRecord> pausas) {
     ),
     headerDecoration: const pw.BoxDecoration(color: _darkGrey),
     cellStyle: pw.TextStyle(fontSize: 9, color: _darkGrey),
-    rowDecoration:
-        const pw.BoxDecoration(border: pw.Border(bottom: pw.BorderSide(color: _lineGrey, width: 0.4))),
+    rowDecoration: const pw.BoxDecoration(
+        border: pw.Border(bottom: pw.BorderSide(color: _lineGrey, width: 0.4))),
     cellAlignments: const {
       0: pw.Alignment.centerLeft,
       1: pw.Alignment.center,
@@ -439,6 +537,7 @@ class _DayAgg {
   final DateTime date;
   int seconds;
   int shifts;
+  final Set<String> matriculas = <String>{};
 }
 // Set your action name, define your arguments and return parameter,
 // and then add the boilerplate code using the green button on the right!

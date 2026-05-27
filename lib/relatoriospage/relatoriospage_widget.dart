@@ -5,6 +5,7 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/index.dart';
+import '/utils/shift_time.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'relatoriospage_model.dart';
@@ -92,15 +93,8 @@ class _RelatoriospageWidgetState extends State<RelatoriospageWidget> {
     return '${h}h ${m.toString().padLeft(2, '0')}m';
   }
 
-  int _shiftSeconds(TurnosRecord t) {
-    if (t.duracaoSegundos > 0) return t.duracaoSegundos;
-    final s = t.inicioTurno;
-    final e = t.fimTurno;
-    if (s != null && e != null && e.isAfter(s)) {
-      return e.difference(s).inSeconds;
-    }
-    return 0;
-  }
+  int _shiftSeconds(TurnosRecord t, List<PausasRecord> pausas) =>
+      effectiveShiftSeconds(t, pausas);
 
   List<TurnosRecord> _applyRange(List<TurnosRecord> all) {
     final r = _resolveRange();
@@ -202,7 +196,7 @@ class _RelatoriospageWidgetState extends State<RelatoriospageWidget> {
                   final filtered = _applyRange(allTurnos);
                   final filteredPausas = _applyRangePausas(allPausas);
                   final totalSeconds = filtered.fold<int>(
-                      0, (s, t) => s + _shiftSeconds(t));
+                      0, (s, t) => s + _shiftSeconds(t, allPausas));
                   return Column(
                     children: [
                       Expanded(
@@ -235,7 +229,7 @@ class _RelatoriospageWidgetState extends State<RelatoriospageWidget> {
                             else
                               ...filtered.map((t) => Padding(
                                     padding: const EdgeInsets.only(bottom: 10),
-                                    child: _shiftCard(theme, t),
+                                    child: _shiftCard(theme, t, allPausas),
                                   )),
                           ],
                         ),
@@ -253,17 +247,12 @@ class _RelatoriospageWidgetState extends State<RelatoriospageWidget> {
   }
 
   Widget _buildTitle(FlutterFlowTheme theme) {
-    return Center(
-      child: Text(
-        tr('reports.title'),
-        style: theme.titleLarge.override(
-          font: GoogleFonts.interTight(fontWeight: FontWeight.bold),
-          color: _accent,
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 0.5,
-        ),
-      ),
+    return Column(
+      children: [
+        dtTextLogo(context),
+        const SizedBox(height: 12),
+        dtSectionTitle(context, tr('reports.title'), fontSize: 32),
+      ],
     );
   }
 
@@ -383,21 +372,7 @@ class _RelatoriospageWidgetState extends State<RelatoriospageWidget> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFD4AF37), Color(0xFFB8860B)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(
-            blurRadius: 10,
-            color: Color(0x55000000),
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
+      decoration: dtGoldCardDecoration(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -453,7 +428,31 @@ class _RelatoriospageWidgetState extends State<RelatoriospageWidget> {
                 ),
               );
               try {
-                await actions.gerarRelatorioPDF(filtered, pausas);
+                MotoristasRecord? motorista;
+                VeiculosRecord? veiculo;
+                try {
+                  final motoristas = await queryMotoristasRecordOnce(
+                    queryBuilder: (q) =>
+                        q.where('email', isEqualTo: currentUserEmail),
+                    singleRecord: true,
+                  );
+                  if (motoristas.isNotEmpty) motorista = motoristas.first;
+                } catch (_) {}
+                try {
+                  final veiculos = await queryVeiculosRecordOnce(
+                    queryBuilder: (q) => q
+                        .where('email', isEqualTo: currentUserEmail)
+                        .where('ativo', isEqualTo: true),
+                    singleRecord: true,
+                  );
+                  if (veiculos.isNotEmpty) veiculo = veiculos.first;
+                } catch (_) {}
+                await actions.gerarRelatorioPDF(
+                  filtered,
+                  pausas,
+                  motorista: motorista,
+                  veiculo: veiculo,
+                );
               } finally {
                 if (mounted) safeSetState(() => _exporting = false);
               }
@@ -495,11 +494,7 @@ class _RelatoriospageWidgetState extends State<RelatoriospageWidget> {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 32),
-      decoration: BoxDecoration(
-        color: theme.secondaryBackground,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: theme.alternate.withOpacity(0.5), width: 1),
-      ),
+      decoration: dtCardDecoration(context),
       child: Column(
         children: [
           Icon(Icons.inbox_outlined,
@@ -519,21 +514,18 @@ class _RelatoriospageWidgetState extends State<RelatoriospageWidget> {
     );
   }
 
-  Widget _shiftCard(FlutterFlowTheme theme, TurnosRecord t) {
+  Widget _shiftCard(
+    FlutterFlowTheme theme,
+    TurnosRecord t,
+    List<PausasRecord> pausas,
+  ) {
     final inProgress = t.fimTurno == null;
     final estado = inProgress
         ? tr('reports.inProgress')
         : (t.estado.isNotEmpty ? t.estado : tr('reports.completed'));
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: theme.secondaryBackground,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: inProgress ? _accent : _accent.withOpacity(0.4),
-          width: 1.2,
-        ),
-      ),
+      decoration: dtCardDecoration(context),
       child: Row(
         children: [
           Container(
@@ -590,7 +582,7 @@ class _RelatoriospageWidgetState extends State<RelatoriospageWidget> {
             ),
           ),
           Text(
-            _formatDuration(_shiftSeconds(t)),
+            _formatDuration(_shiftSeconds(t, pausas)),
             style: theme.titleSmall.override(
               font: GoogleFonts.interTight(fontWeight: FontWeight.bold),
               color: _accent,

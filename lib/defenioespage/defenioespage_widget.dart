@@ -69,12 +69,12 @@ class _DefenioespageWidgetState extends State<DefenioespageWidget> {
                       const SizedBox(height: 8),
                       _languageDropdown(theme),
                       const SizedBox(height: 24),
-                      _sectionLabel(theme, 'Conta'),
+                      _sectionLabel(theme, tr('settings.account')),
                       const SizedBox(height: 8),
                       _navCard(
                         theme: theme,
                         icon: Icons.person,
-                        label: 'Dados do motorista',
+                        label: tr('settings.driverData'),
                         onTap: () => context.pushNamed(
                           DadosmotoristaWidget.routeName,
                         ),
@@ -83,7 +83,7 @@ class _DefenioespageWidgetState extends State<DefenioespageWidget> {
                       _navCard(
                         theme: theme,
                         icon: Icons.directions_car_filled_outlined,
-                        label: 'Dados do veículo',
+                        label: tr('settings.vehicleData'),
                         onTap: () => context.pushNamed(
                           DadosveiculosWidget.routeName,
                         ),
@@ -131,26 +131,9 @@ class _DefenioespageWidgetState extends State<DefenioespageWidget> {
   Widget _buildHeader(FlutterFlowTheme theme) {
     return Column(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: Image.asset(
-            driveTimeTextLogoAsset(context),
-            width: 200,
-            height: 70,
-            fit: BoxFit.contain,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Text(
-          tr('nav.settings'),
-          style: theme.titleLarge.override(
-            font: GoogleFonts.interTight(fontWeight: FontWeight.bold),
-            color: _accent,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 0.5,
-          ),
-        ),
+        dtTextLogo(context),
+        const SizedBox(height: 12),
+        dtSectionTitle(context, tr('nav.settings'), fontSize: 32),
       ],
     );
   }
@@ -287,20 +270,10 @@ class _DefenioespageWidgetState extends State<DefenioespageWidget> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-        decoration: BoxDecoration(
-          color: theme.secondaryBackground,
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: const [
-            BoxShadow(
-              blurRadius: 6,
-              color: Color(0x22000000),
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
+        decoration: dtCardDecoration(context),
         child: Row(
           children: [
             Icon(icon, color: _accent, size: 26),

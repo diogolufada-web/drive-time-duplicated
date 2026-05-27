@@ -12,6 +12,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/internationalization.dart';
 import '/services/notifications_service.dart';
+import '/utils/shift_time.dart';
 
 void _showSnack(String message) {
   debugPrint('stopTurno: $message');
@@ -36,6 +37,19 @@ Future<List<PausasRecord>> _activePausasForTurno(
         .where('email', isEqualTo: currentUserEmail)
         .where('turno_ref', isEqualTo: turnoRef)
         .where('ativo', isEqualTo: true),
+  );
+}
+
+Future<List<PausasRecord>> _allPausasForTurno(
+  DocumentReference turnoRef,
+) async {
+  if (currentUserEmail.isEmpty) {
+    return [];
+  }
+  return queryPausasRecordOnce(
+    queryBuilder: (q) => q
+        .where('email', isEqualTo: currentUserEmail)
+        .where('turno_ref', isEqualTo: turnoRef),
   );
 }
 
@@ -65,7 +79,15 @@ Future<void> stopTurno(TurnosRecord? turno) async {
     }
 
     final openPausas = await _activePausasForTurno(turnoRef);
+    final allPausas = await _allPausasForTurno(turnoRef);
     final now = getCurrentTimestamp;
+
+    final activeSeconds = effectiveShiftSeconds(
+      fresh,
+      allPausas,
+      referenceNow: now,
+    );
+
     final batch = FirebaseFirestore.instance.batch();
 
     for (final pausa in openPausas) {
@@ -80,6 +102,7 @@ Future<void> stopTurno(TurnosRecord? turno) async {
         fimTurno: now,
         estado: 'terminado',
         ativo: false,
+        duracaoSegundos: activeSeconds,
       ),
     );
     await batch.commit();

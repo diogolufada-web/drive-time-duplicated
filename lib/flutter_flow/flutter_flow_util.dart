@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:collection/collection.dart';
 import 'package:from_css_color/from_css_color.dart';
 import 'dart:math' show pow, pi, sin;
@@ -13,6 +14,8 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../main.dart';
+import 'flutter_flow_theme.dart';
+import 'internationalization.dart';
 
 
 export 'lat_lng.dart';
@@ -36,10 +39,11 @@ String dateTimeFormat(String format, DateTime? dateTime, {String? locale}) {
   if (dateTime == null) {
     return '';
   }
+  final effectiveLocale = locale ?? FFLocalizations.languageCode;
   if (format == 'relative') {
-    return timeago.format(dateTime, locale: locale, allowFromNow: true);
+    return timeago.format(dateTime, locale: effectiveLocale, allowFromNow: true);
   }
-  return DateFormat(format, locale).format(dateTime);
+  return DateFormat(format, effectiveLocale).format(dateTime);
 }
 
 Future launchURL(String url) async {
@@ -298,6 +302,152 @@ String driveTimeTextLogoAsset(BuildContext context) {
 
 /// Apenas o simbolo DT dourado (sem texto). Universal entre temas.
 const String driveTimeMarkAsset = 'assets/images/drive_time_mark.png';
+
+/// Logotipo "DRIVE TIME" so texto, com tamanho normalizado para todas as
+/// paginas. Imagem tem aspect ratio ~10:1 (texto largo e baixo); por isso
+/// limitamos largura maxima e usamos uma altura modesta.
+Widget dtTextLogo(BuildContext context, {double height = 32.0, double maxWidth = 220.0}) {
+  return Center(
+    child: ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: Image.asset(
+        driveTimeTextLogoAsset(context),
+        height: height,
+        fit: BoxFit.contain,
+      ),
+    ),
+  );
+}
+
+/// InputDecoration partilhada para todos os formularios. Garante que os
+/// campos tem:
+/// - fundo a contrastar com o card-pai (primaryBackground -> mais claro/escuro
+///   que o card branco/cinza)
+/// - borda cinzenta sempre visivel e borda dourada quando o campo esta focado.
+InputDecoration dtInputDecoration(
+  BuildContext context, {
+  required String labelText,
+  String? hintText,
+}) {
+  final theme = FlutterFlowTheme.of(context);
+  return InputDecoration(
+    isDense: true,
+    labelText: labelText,
+    labelStyle: theme.labelMedium.override(
+      font: GoogleFonts.inter(fontWeight: FontWeight.bold),
+      color: kDtGold,
+      fontSize: 15.0,
+      fontWeight: FontWeight.bold,
+    ),
+    floatingLabelBehavior: FloatingLabelBehavior.always,
+    hintText: hintText,
+    hintStyle: theme.labelMedium.override(
+      font: GoogleFonts.inter(fontWeight: FontWeight.w400),
+      color: theme.secondaryText,
+      fontSize: 14.0,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: theme.alternate, width: 1.0),
+      borderRadius: BorderRadius.circular(10.0),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderSide: const BorderSide(color: kDtGold, width: 1.8),
+      borderRadius: BorderRadius.circular(10.0),
+    ),
+    errorBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: theme.error, width: 1.0),
+      borderRadius: BorderRadius.circular(10.0),
+    ),
+    focusedErrorBorder: OutlineInputBorder(
+      borderSide: BorderSide(color: theme.error, width: 1.8),
+      borderRadius: BorderRadius.circular(10.0),
+    ),
+    filled: true,
+    fillColor: theme.primaryBackground,
+    contentPadding:
+        const EdgeInsets.symmetric(horizontal: 14.0, vertical: 14.0),
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Design system Drive Time - tokens partilhados
+// ---------------------------------------------------------------------------
+
+/// Cor de acento principal (dourado).
+const Color kDtGold = Color(0xFFD4AF37);
+
+/// Cor de acento secundario (dourado escuro).
+const Color kDtGoldDark = Color(0xFFB8860B);
+
+/// Gradiente dourado claro -> escuro usado em cards e botoes destacados.
+const LinearGradient kDtGoldGradient = LinearGradient(
+  colors: [kDtGold, kDtGoldDark],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+);
+
+/// Container "card" partilhado entre todas as paginas. Borda dourada fina,
+/// raio uniforme e leve sombra para destacar em ambos os temas.
+BoxDecoration dtCardDecoration(BuildContext context, {double radius = 16.0}) {
+  return BoxDecoration(
+    color: FlutterFlowTheme.of(context).secondaryBackground,
+    borderRadius: BorderRadius.circular(radius),
+    border: Border.all(color: kDtGold, width: 1.5),
+    boxShadow: const [
+      BoxShadow(
+        color: Color(0x33000000),
+        blurRadius: 10,
+        offset: Offset(0, 4),
+      ),
+    ],
+  );
+}
+
+/// Decoracao com fundo em gradiente dourado, util para cards de destaque
+/// (ex.: "Total da semana").
+BoxDecoration dtGoldCardDecoration({double radius = 16.0}) {
+  return BoxDecoration(
+    gradient: kDtGoldGradient,
+    borderRadius: BorderRadius.circular(radius),
+    boxShadow: const [
+      BoxShadow(
+        color: Color(0x55000000),
+        blurRadius: 12,
+        offset: Offset(0, 4),
+      ),
+    ],
+  );
+}
+
+/// Titulo de seccao com gradiente que vai da cor do texto (preto no light,
+/// branco no dark) ate ao dourado. Usado como cabecalho das paginas.
+Widget dtSectionTitle(
+  BuildContext context,
+  String text, {
+  double fontSize = 32.0,
+  TextAlign textAlign = TextAlign.center,
+}) {
+  final theme = FlutterFlowTheme.of(context);
+  return ShaderMask(
+    shaderCallback: (rect) => LinearGradient(
+      colors: [theme.primaryText, kDtGold],
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+    ).createShader(rect),
+    blendMode: BlendMode.srcIn,
+    child: Text(
+      text,
+      textAlign: textAlign,
+      style: TextStyle(
+        fontFamily: 'InterTight',
+        fontSize: fontSize,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 0.3,
+        color: Colors.white,
+      ),
+    ),
+  );
+}
 
 void showSnackbar(
   BuildContext context,
