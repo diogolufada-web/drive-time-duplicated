@@ -2,3 +2,4 @@ storePassword=CHANGE_ME
 keyPassword=CHANGE_ME
 keyAlias=upload
 storeFile=upload-keystore.jks
+# Ficheiro em android/upload-keystore.jks (gerado por tools/generate_release_keystore.ps1)

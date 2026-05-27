@@ -35,7 +35,7 @@ if (-not (Test-Path $props)) {
     Copy-Item $propsExample $props
     (Get-Content $props) `
         -replace 'CHANGE_ME', 'drivetime2026' `
-        -replace 'storeFile=upload-keystore.jks', 'storeFile=../upload-keystore.jks' |
+        -replace 'storeFile=upload-keystore.jks', 'storeFile=upload-keystore.jks' |
         Set-Content $props
     Write-Host "key.properties criado. Edita passwords antes de publicar na Play Store."
 }
