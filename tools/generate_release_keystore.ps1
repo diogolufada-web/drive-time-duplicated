@@ -5,9 +5,13 @@ $ErrorActionPreference = "Stop"
 $androidDir = Join-Path $PSScriptRoot "..\android"
 $keystore = Join-Path $androidDir "upload-keystore.jks"
 $keytool = "keytool"
-
 if (-not (Get-Command $keytool -ErrorAction SilentlyContinue)) {
-    Write-Error "keytool nao encontrado. Instala o JDK e adiciona-o ao PATH."
+    $asKeytool = "C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe"
+    if (Test-Path $asKeytool) {
+        $keytool = $asKeytool
+    } else {
+        Write-Error "keytool nao encontrado. Instala o JDK ou Android Studio."
+    }
 }
 
 if (Test-Path $keystore) {

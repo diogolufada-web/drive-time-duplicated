@@ -55,9 +55,7 @@ android {
     }
 
     defaultConfig {
-        // BETA: deve coincidir com google-services.json. Para Play Store com pt.drivetime.app,
-        // adiciona a app no Firebase Console e substitui o JSON.
-        applicationId "com.mycompany.drivetime"
+        applicationId "pt.drivetime.app"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()

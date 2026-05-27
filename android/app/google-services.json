@@ -49,6 +49,42 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:481957119633:android:1be8a6045df983935ea130",
+        "android_client_info": {
+          "package_name": "pt.drivetime.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "481957119633-0d1sm5sf1qijjav28567kec81vkhu21e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDK_TyLOc7F3QA4guhVOyXN7P1fmcxKjsE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "481957119633-0d1sm5sf1qijjav28567kec81vkhu21e.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "481957119633-3g353j8ug2e8hv9oj01oi2hvshqdj7n0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mycompany.drivetime"
+              }
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"
