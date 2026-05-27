@@ -138,7 +138,17 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           path: DadosveiculosWidget.routePath,
           requireAuth: true,
           builder: (context, params) => DadosveiculosWidget(),
-        )
+        ),
+        FFRoute(
+          name: LegalPageWidget.privacyRouteName,
+          path: LegalPageWidget.privacyRoutePath,
+          builder: (context, params) => LegalPageWidget.privacy(),
+        ),
+        FFRoute(
+          name: LegalPageWidget.termsRouteName,
+          path: LegalPageWidget.termsRoutePath,
+          builder: (context, params) => LegalPageWidget.terms(),
+        ),
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );
 

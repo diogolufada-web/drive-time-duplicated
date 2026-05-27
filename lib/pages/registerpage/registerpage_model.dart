@@ -1,10 +1,13 @@
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
+import '/utils/form_validators.dart';
 import 'registerpage_widget.dart' show RegisterpageWidget;
 import 'package:flutter/material.dart';
 
 class RegisterpageModel extends FlutterFlowModel<RegisterpageWidget> {
   ///  State fields for stateful widgets in this page.
+
+  final formKey = GlobalKey<FormState>();
 
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode1;
@@ -42,6 +45,13 @@ class RegisterpageModel extends FlutterFlowModel<RegisterpageWidget> {
   void initState(BuildContext context) {
     passwordVisibility1 = false;
     passwordVisibility2 = false;
+    emailTextControllerValidator = validateEmail;
+    passwordTextControllerValidator = validatePassword;
+    confirmPasswordTextControllerValidator = validatePassword;
+    textController2Validator = validateRequired;
+    textController3Validator = validateNif;
+    textController4Validator = validatePhone;
+    textController5Validator = validateRequired;
   }
 
   @override

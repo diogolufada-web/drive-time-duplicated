@@ -4,6 +4,7 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/index.dart';
+import '/utils/form_validators.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dadosveiculos_model.dart';
@@ -48,10 +49,16 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
 
   Future<void> _save(VeiculosRecord? existing) async {
     if (_saving) return;
+    if (_model.formKey.currentState == null ||
+        !_model.formKey.currentState!.validate()) {
+      return;
+    }
     _saving = true;
     try {
+      final plate = normalizePlate(_model.textController1!.text);
+      _model.textController1!.text = plate;
       final data = createVeiculosRecordData(
-        matricula: _model.textController1?.text.trim(),
+        matricula: plate,
         marca: _model.textController2?.text.trim(),
         ano: _model.textController3?.text.trim(),
         cor: _model.textController4?.text.trim(),
@@ -139,7 +146,9 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 18),
                         decoration: dtCardDecoration(context),
-                        child: Column(
+                        child: Form(
+                          key: _model.formKey,
+                          child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             _field(
@@ -209,6 +218,7 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
                                   .asValidator(context),
                             ),
                           ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: 24),

@@ -69,7 +69,7 @@ Future<void> gerarRelatorioPDF(
             completedShifts: completedShifts,
           ),
           pw.SizedBox(height: 18),
-          _sectionTitle('Resumo diário'),
+          _sectionTitle('Resumo diario'),
           pw.SizedBox(height: 6),
           _dailyBreakdownTable(safeTurnos, safePausas),
           pw.SizedBox(height: 18),
@@ -90,7 +90,7 @@ Future<void> gerarRelatorioPDF(
               borderRadius: pw.BorderRadius.circular(4),
             ),
             child: pw.Text(
-              'Documento gerado pela aplicação Drive Time em ${_formatDateTime(DateTime.now())}.',
+              'Documento gerado pela aplicacao Drive Time em ${_formatDateTime(DateTime.now())}.',
               style: pw.TextStyle(fontSize: 9, color: _darkGrey),
             ),
           ),
@@ -136,13 +136,13 @@ String _periodLabel(List<TurnosRecord> turnos) {
       .map((t) => t.inicioTurno!)
       .toList()
     ..sort();
-  return '${_formatDate(dates.first)} – ${_formatDate(dates.last)}';
+  return '${_formatDate(dates.first)} - ${_formatDate(dates.last)}';
 }
 
 String _fallback(String? value) {
-  if (value == null) return '—';
+  if (value == null) return '-';
   final trimmed = value.trim();
-  return trimmed.isEmpty ? '—' : trimmed;
+  return trimmed.isEmpty ? '-' : trimmed;
 }
 
 pw.Widget _header({required String motorista, required String matricula}) {
@@ -169,7 +169,7 @@ pw.Widget _header({required String motorista, required String matricula}) {
             ),
             pw.SizedBox(height: 2),
             pw.Text(
-              'Relatório de horas trabalhadas',
+              'Relatorio de horas trabalhadas',
               style: pw.TextStyle(
                 fontSize: 10,
                 color: _midGrey,
@@ -191,7 +191,7 @@ pw.Widget _header({required String motorista, required String matricula}) {
               ),
             pw.SizedBox(height: 2),
             pw.Text(
-              'Matrícula: $matricula',
+              'Matricula: $matricula',
               style: pw.TextStyle(fontSize: 9, color: _midGrey),
             ),
           ],
@@ -211,11 +211,11 @@ pw.Widget _footer(pw.Context ctx) {
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       children: [
         pw.Text(
-          'Drive Time © ${DateTime.now().year}',
+          'Drive Time (c) ${DateTime.now().year} - Controlo de Horas para Motoristas TVDE',
           style: pw.TextStyle(fontSize: 8, color: _midGrey),
         ),
         pw.Text(
-          'Página ${ctx.pageNumber} / ${ctx.pagesCount}',
+          'Pagina ${ctx.pageNumber} / ${ctx.pagesCount}',
           style: pw.TextStyle(fontSize: 8, color: _midGrey),
         ),
       ],
@@ -264,7 +264,6 @@ pw.Widget _driverInfoCard({
               ('NIF', _fallback(m?.nif)),
               ('Telefone', _fallback(m?.telefone)),
               ('Certificado CMTVDE', _fallback(m?.certeficadocmtvde)),
-              ('Carta de condução', _fallback(m?.cartadeconducao)),
               ('Email', _fallback(m?.email)),
             ],
           ),
@@ -276,13 +275,13 @@ pw.Widget _driverInfoCard({
         ),
         pw.Expanded(
           child: _infoColumn(
-            title: 'Veículo',
+            title: 'Veiculo',
             rows: [
-              ('Matrícula', _fallback(v?.matricula)),
+              ('Matricula', _fallback(v?.matricula)),
               ('Marca', _fallback(v?.marca)),
               ('Ano', _fallback(v?.ano)),
               ('Cor', _fallback(v?.cor)),
-              ('Licença operador', _fallback(v?.licencaoperador)),
+              ('Licenca operador', _fallback(v?.licencaoperador)),
             ],
           ),
         ),
@@ -354,13 +353,13 @@ pw.Widget _summaryCard({
     child: pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        _summaryItem('Período', periodLabel),
+        _summaryItem('Periodo', periodLabel),
         _vDivider(),
         _summaryItem('Total horas', _formatDuration(totalSeconds), bold: true),
         _vDivider(),
         _summaryItem('Turnos', shiftsCount.toString()),
         _vDivider(),
-        _summaryItem('Concluídos', completedShifts.toString()),
+        _summaryItem('Concluidos', completedShifts.toString()),
       ],
     ),
   );
@@ -421,11 +420,11 @@ pw.Widget _dailyBreakdownTable(
   final sorted = byDay.values.toList()
     ..sort((a, b) => b.date.compareTo(a.date));
   if (sorted.isEmpty) {
-    return pw.Text('Sem turnos no período.',
+    return pw.Text('Sem turnos no periodo.',
         style: pw.TextStyle(fontSize: 10, color: _midGrey));
   }
   return pw.Table.fromTextArray(
-    headers: ['Data', 'Matrícula', 'Turnos', 'Total'],
+    headers: ['Data', 'Matricula', 'Turnos', 'Total'],
     data: sorted
         .map((d) => [
               _formatDate(d.date),
@@ -464,15 +463,15 @@ pw.Widget _shiftsTable(
   List<PausasRecord> pausas,
 ) {
   if (turnos.isEmpty) {
-    return pw.Text('Sem turnos no período.',
+    return pw.Text('Sem turnos no periodo.',
         style: pw.TextStyle(fontSize: 10, color: _midGrey));
   }
   return pw.Table.fromTextArray(
-    headers: ['Data', 'Início', 'Fim', 'Estado', 'Matrícula', 'Duração'],
+    headers: ['Data', 'Inicio', 'Fim', 'Estado', 'Matricula', 'Duracao'],
     data: turnos.map((t) {
       final estado = (t.estado.isNotEmpty)
           ? t.estado
-          : (t.fimTurno == null ? 'Em curso' : 'Concluído');
+          : (t.fimTurno == null ? 'Em curso' : 'Concluido');
       final matricula = t.matricula.isNotEmpty ? t.matricula : '-';
       return [
         _formatDate(t.inicioTurno),
@@ -506,7 +505,7 @@ pw.Widget _shiftsTable(
 
 pw.Widget _pausasTable(List<PausasRecord> pausas) {
   return pw.Table.fromTextArray(
-    headers: ['Data', 'Início pausa', 'Fim pausa'],
+    headers: ['Data', 'Inicio pausa', 'Fim pausa'],
     data: pausas
         .map((p) => [
               p.dataDia.isNotEmpty ? p.dataDia : _formatDate(p.inicioPausa),

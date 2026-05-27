@@ -88,6 +88,26 @@ class _DefenioespageWidgetState extends State<DefenioespageWidget> {
                           DadosveiculosWidget.routeName,
                         ),
                       ),
+                      const SizedBox(height: 24),
+                      _sectionLabel(theme, tr('settings.legal')),
+                      const SizedBox(height: 8),
+                      _navCard(
+                        theme: theme,
+                        icon: Icons.privacy_tip_outlined,
+                        label: tr('settings.privacy'),
+                        onTap: () => context.pushNamed(
+                          LegalPageWidget.privacyRouteName,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _navCard(
+                        theme: theme,
+                        icon: Icons.description_outlined,
+                        label: tr('settings.terms'),
+                        onTap: () => context.pushNamed(
+                          LegalPageWidget.termsRouteName,
+                        ),
+                      ),
                       const SizedBox(height: 28),
                       FFButtonWidget(
                         onPressed: () async {

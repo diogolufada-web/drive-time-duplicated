@@ -1,10 +1,13 @@
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
+import '/utils/form_validators.dart';
 import 'dadosmotorista_widget.dart' show DadosmotoristaWidget;
 import 'package:flutter/material.dart';
 
 class DadosmotoristaModel extends FlutterFlowModel<DadosmotoristaWidget> {
   ///  State fields for stateful widgets in this page.
+
+  final formKey = GlobalKey<FormState>();
 
   // State field(s) for TextField widget.
   FocusNode? textFieldFocusNode1;
@@ -28,7 +31,13 @@ class DadosmotoristaModel extends FlutterFlowModel<DadosmotoristaWidget> {
   String? Function(BuildContext, String?)? textController5Validator;
 
   @override
-  void initState(BuildContext context) {}
+  void initState(BuildContext context) {
+    textController1Validator = validateRequired;
+    textController2Validator = validateEmail;
+    textController3Validator = validatePhone;
+    textController4Validator = validateRequired;
+    textController5Validator = validateNif;
+  }
 
   @override
   void dispose() {

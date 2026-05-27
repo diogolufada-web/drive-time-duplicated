@@ -320,4 +320,75 @@ const Map<String, Map<String, String>> _kTranslations = {
     'pt': 'Erro ao guardar. Tenta novamente.',
     'en': 'Error saving. Try again.',
   },
+  'settings.legal': {'pt': 'Legal', 'en': 'Legal'},
+  'settings.privacy': {
+    'pt': 'Politica de Privacidade',
+    'en': 'Privacy Policy',
+  },
+  'settings.terms': {
+    'pt': 'Termos de Utilizacao',
+    'en': 'Terms of Use',
+  },
+  'legal.privacy.title': {
+    'pt': 'Politica de Privacidade',
+    'en': 'Privacy Policy',
+  },
+  'legal.privacy.body': {
+    'pt':
+        'A Drive Time trata os dados necessarios ao registo de turnos, pausas e relatorios TVDE. Os dados ficam associados a tua conta e sao usados apenas para o funcionamento da aplicacao. Podes pedir correcao ou eliminacao contactando o suporte. Nao vendemos dados pessoais a terceiros.',
+    'en':
+        'Drive Time processes data needed to register shifts, breaks, and TVDE reports. Data is linked to your account and used only to run the app. You may request correction or deletion by contacting support. We do not sell personal data to third parties.',
+  },
+  'legal.terms.title': {
+    'pt': 'Termos de Utilizacao',
+    'en': 'Terms of Use',
+  },
+  'legal.terms.body': {
+    'pt':
+        'A Drive Time e uma ferramenta de apoio ao registo de horas para motoristas TVDE. Os relatorios e totais sao informativos: deves validar sempre os registos e cumprir a legislacao aplicavel. O uso continuado da app implica aceitacao destes termos.',
+    'en':
+        'Drive Time is a support tool for logging hours for TVDE drivers. Reports and totals are informational: always verify records and comply with applicable law. Continued use of the app means you accept these terms.',
+  },
+  'validation.required': {
+    'pt': 'Campo obrigatorio.',
+    'en': 'Required field.',
+  },
+  'validation.email': {
+    'pt': 'Email invalido.',
+    'en': 'Invalid email.',
+  },
+  'validation.passwordMin': {
+    'pt': 'Minimo 6 caracteres.',
+    'en': 'At least 6 characters.',
+  },
+  'validation.passwordMatch': {
+    'pt': 'As palavras-passe nao coincidem.',
+    'en': 'Passwords do not match.',
+  },
+  'validation.nif': {
+    'pt': 'NIF deve ter 9 digitos.',
+    'en': 'Tax ID must have 9 digits.',
+  },
+  'validation.phone': {
+    'pt': 'Telefone deve ter 9 digitos.',
+    'en': 'Phone must have 9 digits.',
+  },
+  'validation.plate': {
+    'pt': 'Matricula invalida (ex: AB-12-CD).',
+    'en': 'Invalid plate (e.g. AB-12-CD).',
+  },
+  'validation.year': {
+    'pt': 'Ano invalido.',
+    'en': 'Invalid year.',
+  },
+  'shift.stopConfirmTitle': {
+    'pt': 'Terminar turno?',
+    'en': 'End shift?',
+  },
+  'shift.stopConfirmBody': {
+    'pt': 'Queres mesmo terminar o turno actual?',
+    'en': 'Do you really want to end the current shift?',
+  },
+  'common.cancel': {'pt': 'Cancelar', 'en': 'Cancel'},
+  'common.confirm': {'pt': 'Confirmar', 'en': 'Confirm'},
 };

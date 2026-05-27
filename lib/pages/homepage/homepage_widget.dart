@@ -216,6 +216,26 @@ class _HomepageWidgetState extends State<HomepageWidget> {
     if (_shiftBusy) {
       return;
     }
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(tr('shift.stopConfirmTitle')),
+        content: Text(tr('shift.stopConfirmBody')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(tr('common.cancel')),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(tr('common.confirm')),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) {
+      return;
+    }
     _shiftBusy = true;
     try {
       final fresh = await _loadFreshActiveTurno(turno);

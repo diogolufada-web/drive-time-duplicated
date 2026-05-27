@@ -7,3 +7,4 @@ export '/relatoriospage/relatoriospage_widget.dart' show RelatoriospageWidget;
 export '/defenioespage/defenioespage_widget.dart' show DefenioespageWidget;
 export '/dadosmotorista/dadosmotorista_widget.dart' show DadosmotoristaWidget;
 export '/dadosveiculos/dadosveiculos_widget.dart' show DadosveiculosWidget;
+export '/legal/legal_page_widget.dart' show LegalPageWidget;

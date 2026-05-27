@@ -121,7 +121,9 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16.0, vertical: 18.0),
                           decoration: dtCardDecoration(context),
-                          child: Column(
+                          child: Form(
+                            key: _model.formKey,
+                            child: Column(
                             mainAxisSize: MainAxisSize.max,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -718,6 +720,11 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                               padding: EdgeInsets.all(2.0),
                               child: FFButtonWidget(
                                 onPressed: () async {
+                                  if (_model.formKey.currentState == null ||
+                                      !_model.formKey.currentState!
+                                          .validate()) {
+                                    return;
+                                  }
                                   await dadosmotoristaMotoristasRecord!
                                       .reference
                                       .update(createMotoristasRecordData(
@@ -819,6 +826,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                             ]
                                 .divide(SizedBox(height: 12.0))
                                 .around(SizedBox(height: 12.0)),
+                          ),
                           ),
                         ),
                       ),

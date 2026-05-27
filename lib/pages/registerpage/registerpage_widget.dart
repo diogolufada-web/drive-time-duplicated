@@ -128,6 +128,11 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                   ),
                 ),
               ),
+              Form(
+                key: _model.formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
               Padding(
                 padding: EdgeInsets.all(5.0),
                 child: Container(
@@ -884,13 +889,15 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                 child: FFButtonWidget(
                   onPressed: () async {
                     GoRouter.of(context).prepareAuthEvent();
+                    if (_model.formKey.currentState == null ||
+                        !_model.formKey.currentState!.validate()) {
+                      return;
+                    }
                     if (_model.passwordTextController.text !=
                         _model.confirmPasswordTextController.text) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(
-                            'Passwords don\'t match!',
-                          ),
+                          content: Text(tr('validation.passwordMatch')),
                         ),
                       );
                       return;
@@ -954,6 +961,9 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                     elevation: 0.0,
                     borderRadius: BorderRadius.circular(8.0),
                   ),
+                ),
+              ),
+                  ],
                 ),
               ),
             ],

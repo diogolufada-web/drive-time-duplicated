@@ -101,7 +101,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'drive time duplicated',
+      title: 'Drive Time',
       scrollBehavior: MyAppScrollBehavior(),
       locale: _locale,
       localizationsDelegates: const [
