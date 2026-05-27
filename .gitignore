@@ -14,5 +14,6 @@ ios/Flutter/ephemeral/
 Thumbs.db
 local.properties
 key.properties
+android/upload-keystore.jks
 *.jks
 *.keystore

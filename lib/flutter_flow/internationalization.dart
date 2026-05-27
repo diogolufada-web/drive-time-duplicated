@@ -391,4 +391,19 @@ const Map<String, Map<String, String>> _kTranslations = {
   },
   'common.cancel': {'pt': 'Cancelar', 'en': 'Cancel'},
   'common.confirm': {'pt': 'Confirmar', 'en': 'Confirm'},
+  'auth.email': {'pt': 'Email', 'en': 'Email'},
+  'auth.password': {'pt': 'Palavra-passe', 'en': 'Password'},
+  'auth.emailHint': {
+    'pt': 'Introduz o teu email',
+    'en': 'Enter your email',
+  },
+  'auth.passwordHint': {
+    'pt': 'Introduz a palavra-passe',
+    'en': 'Enter your password',
+  },
+  'auth.signIn': {'pt': 'Entrar', 'en': 'Sign in'},
+  'onboarding.completeProfile': {
+    'pt': 'Completa os dados do motorista e do veiculo em Definicoes.',
+    'en': 'Complete driver and vehicle data in Settings.',
+  },
 };

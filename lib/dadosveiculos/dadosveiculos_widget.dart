@@ -78,6 +78,9 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(tr('form.saved'))),
       );
+      if (existing == null) {
+        context.goNamedAuth(HomepageWidget.routeName, context.mounted);
+      }
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

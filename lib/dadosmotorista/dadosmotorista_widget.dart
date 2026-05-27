@@ -735,6 +735,25 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                         _model.textController4.text,
                                     nif: _model.textController5.text,
                                   ));
+                                  if (!context.mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(tr('form.saved'))),
+                                  );
+                                  final veiculo =
+                                      await queryVeiculosRecordOnce(
+                                    queryBuilder: (q) => q
+                                        .where('email',
+                                            isEqualTo: currentUserEmail)
+                                        .where('ativo', isEqualTo: true),
+                                    singleRecord: true,
+                                  ).then((s) => s.firstOrNull);
+                                  if (!context.mounted) return;
+                                  if (veiculo == null ||
+                                      veiculo.matricula.trim().isEmpty) {
+                                    context.pushNamed(
+                                      DadosveiculosWidget.routeName,
+                                    );
+                                  }
                                 },
                                 text: tr('form.save'),
                                 options: FFButtonOptions(

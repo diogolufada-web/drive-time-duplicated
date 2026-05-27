@@ -89,6 +89,18 @@ class _HomepageWidgetState extends State<HomepageWidget> {
             .where('ativo', isEqualTo: true),
         singleRecord: true,
       ).then((s) => s.firstOrNull);
+      final motorista = await queryMotoristasRecordOnce(
+        queryBuilder: (q) => q.where('email', isEqualTo: currentUserEmail),
+        singleRecord: true,
+      ).then((s) => s.firstOrNull);
+      if (!mounted) return;
+      final profileIncomplete = motorista == null ||
+          motorista.nif.trim().isEmpty ||
+          _model.veiculodoc == null ||
+          _model.veiculodoc!.matricula.trim().isEmpty;
+      if (profileIncomplete) {
+        _showShiftSnack(tr('onboarding.completeProfile'));
+      }
       safeSetState(() {});
     });
   }

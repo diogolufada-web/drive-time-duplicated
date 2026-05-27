@@ -71,58 +71,11 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
                   ),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.all(24.0),
-                child: FFButtonWidget(
-                  onPressed: () async {
-                    GoRouter.of(context).prepareAuthEvent();
-
-                    final user = await authManager.signInWithEmail(
-                      context,
-                      _model.emailTextController.text,
-                      _model.passwordTextController.text,
-                    );
-                    if (user == null) {
-                      return;
-                    }
-
-                    context.goNamedAuth(
-                        HomepageWidget.routeName, context.mounted);
-                  },
-                  text: 'Sign In',
-                  options: FFButtonOptions(
-                    width: 251.9,
-                    height: 45.66,
-                    padding:
-                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
-                    iconPadding:
-                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
-                    color: Color(0xFFD4AF37),
-                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
-                      font: GoogleFonts.interTight(
-                        fontWeight: FontWeight.bold,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                      ),
-                      color: FlutterFlowTheme.of(context).secondaryBackground,
-                      fontSize: 25.0,
-                      letterSpacing: 0.0,
-                      fontWeight: FontWeight.bold,
-                      fontStyle:
-                          FlutterFlowTheme.of(context).titleSmall.fontStyle,
-                      shadows: [
-                        Shadow(
-                          color: FlutterFlowTheme.of(context).secondaryText,
-                          offset: Offset(2.0, 2.0),
-                          blurRadius: 2.0,
-                        )
-                      ],
-                    ),
-                    elevation: 0.0,
-                    borderRadius: BorderRadius.circular(20.0),
-                  ),
-                ),
-              ),
+              Form(
+                key: _model.formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
               Align(
                 alignment: AlignmentDirectional(0.0, 0.0),
                 child: Padding(
@@ -135,83 +88,10 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
                       autofocus: false,
                       enabled: true,
                       obscureText: false,
-                      decoration: InputDecoration(
-                        isDense: true,
-                        labelText: 'Email',
-                        labelStyle:
-                            FlutterFlowTheme.of(context).labelMedium.override(
-                          font: GoogleFonts.inter(
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .labelMedium
-                                .fontStyle,
-                          ),
-                          color: FlutterFlowTheme.of(context).warning,
-                          fontSize: 20.0,
-                          letterSpacing: 0.0,
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FlutterFlowTheme.of(context)
-                              .labelMedium
-                              .fontStyle,
-                          shadows: [
-                            Shadow(
-                              color: FlutterFlowTheme.of(context).secondaryText,
-                              offset: Offset(2.0, 2.0),
-                              blurRadius: 2.0,
-                            )
-                          ],
-                        ),
-                        alignLabelWithHint: false,
-                        hintText: 'Inserir email',
-                        hintStyle:
-                            FlutterFlowTheme.of(context).labelMedium.override(
-                                  font: GoogleFonts.inter(
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .labelMedium
-                                        .fontStyle,
-                                  ),
-                                  letterSpacing: 0.0,
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontStyle,
-                                ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color(0x00000000),
-                            width: 1.0,
-                          ),
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color(0x00000000),
-                            width: 1.0,
-                          ),
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: FlutterFlowTheme.of(context).error,
-                            width: 1.0,
-                          ),
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        focusedErrorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: FlutterFlowTheme.of(context).error,
-                            width: 1.0,
-                          ),
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        filled: true,
-                        fillColor:
-                            FlutterFlowTheme.of(context).secondaryBackground,
+                      decoration: dtInputDecoration(
+                        context,
+                        labelText: tr('auth.email'),
+                        hintText: tr('auth.emailHint'),
                       ),
                       style: FlutterFlowTheme.of(context).bodyMedium.override(
                             font: GoogleFonts.inter(
@@ -248,81 +128,11 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
                     autofocus: false,
                     enabled: true,
                     obscureText: !_model.passwordVisibility,
-                    decoration: InputDecoration(
-                      isDense: true,
-                      labelText: 'Password',
-                      labelStyle:
-                          FlutterFlowTheme.of(context).labelMedium.override(
-                        font: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          fontStyle: FlutterFlowTheme.of(context)
-                              .labelMedium
-                              .fontStyle,
-                        ),
-                        color: FlutterFlowTheme.of(context).warning,
-                        fontSize: 20.0,
-                        letterSpacing: 0.0,
-                        fontWeight: FontWeight.bold,
-                        fontStyle:
-                            FlutterFlowTheme.of(context).labelMedium.fontStyle,
-                        shadows: [
-                          Shadow(
-                            color: FlutterFlowTheme.of(context).secondaryText,
-                            offset: Offset(2.0, 2.0),
-                            blurRadius: 2.0,
-                          )
-                        ],
-                      ),
-                      hintText: 'Password',
-                      hintStyle:
-                          FlutterFlowTheme.of(context).labelMedium.override(
-                                font: GoogleFonts.inter(
-                                  fontWeight: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontWeight,
-                                  fontStyle: FlutterFlowTheme.of(context)
-                                      .labelMedium
-                                      .fontStyle,
-                                ),
-                                letterSpacing: 0.0,
-                                fontWeight: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .fontWeight,
-                                fontStyle: FlutterFlowTheme.of(context)
-                                    .labelMedium
-                                    .fontStyle,
-                              ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color(0x00000000),
-                          width: 1.0,
-                        ),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Color(0x00000000),
-                          width: 1.0,
-                        ),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: FlutterFlowTheme.of(context).error,
-                          width: 1.0,
-                        ),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      focusedErrorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: FlutterFlowTheme.of(context).error,
-                          width: 1.0,
-                        ),
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      filled: true,
-                      fillColor:
-                          FlutterFlowTheme.of(context).secondaryBackground,
+                    decoration: dtInputDecoration(
+                      context,
+                      labelText: tr('auth.password'),
+                      hintText: tr('auth.passwordHint'),
+                    ).copyWith(
                       suffixIcon: InkWell(
                         onTap: () async {
                           safeSetState(() => _model.passwordVisibility =
@@ -358,6 +168,65 @@ class _LoginpageWidgetState extends State<LoginpageWidget> {
                     validator: _model.passwordTextControllerValidator
                         .asValidator(context),
                   ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(24.0),
+                child: FFButtonWidget(
+                  onPressed: () async {
+                    GoRouter.of(context).prepareAuthEvent();
+                    if (_model.formKey.currentState == null ||
+                        !_model.formKey.currentState!.validate()) {
+                      return;
+                    }
+
+                    final user = await authManager.signInWithEmail(
+                      context,
+                      _model.emailTextController.text,
+                      _model.passwordTextController.text,
+                    );
+                    if (user == null) {
+                      return;
+                    }
+
+                    context.goNamedAuth(
+                        HomepageWidget.routeName, context.mounted);
+                  },
+                  text: tr('auth.signIn'),
+                  options: FFButtonOptions(
+                    width: 251.9,
+                    height: 45.66,
+                    padding:
+                        EdgeInsetsDirectional.fromSTEB(16.0, 0.0, 16.0, 0.0),
+                    iconPadding:
+                        EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 0.0),
+                    color: Color(0xFFD4AF37),
+                    textStyle: FlutterFlowTheme.of(context).titleSmall.override(
+                      font: GoogleFonts.interTight(
+                        fontWeight: FontWeight.bold,
+                        fontStyle:
+                            FlutterFlowTheme.of(context).titleSmall.fontStyle,
+                      ),
+                      color: FlutterFlowTheme.of(context).secondaryBackground,
+                      fontSize: 25.0,
+                      letterSpacing: 0.0,
+                      fontWeight: FontWeight.bold,
+                      fontStyle:
+                          FlutterFlowTheme.of(context).titleSmall.fontStyle,
+                      shadows: [
+                        Shadow(
+                          color: FlutterFlowTheme.of(context).secondaryText,
+                          offset: Offset(2.0, 2.0),
+                          blurRadius: 2.0,
+                        )
+                      ],
+                    ),
+                    elevation: 0.0,
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                ),
+              ),
+                  ],
                 ),
               ),
               Padding(

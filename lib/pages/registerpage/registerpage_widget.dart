@@ -924,7 +924,7 @@ class _RegisterpageWidgetState extends State<RegisterpageWidget> {
                         ));
 
                     context.goNamedAuth(
-                      DadosveiculosWidget.routeName,
+                      DadosmotoristaWidget.routeName,
                       context.mounted,
                     );
                   },
