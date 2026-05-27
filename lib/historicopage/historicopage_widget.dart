@@ -60,13 +60,15 @@ class _HistoricopageWidgetState extends State<HistoricopageWidget> {
               Expanded(
                 child: StreamBuilder<List<PausasRecord>>(
                   stream: queryPausasRecord(
-                    queryBuilder: (q) => q
-                        .where('email', isEqualTo: currentUserEmail)
-                        .where('inicio_pausa',
-                            isGreaterThanOrEqualTo: startOfWindow),
+                    queryBuilder: (q) =>
+                        q.where('email', isEqualTo: currentUserEmail),
                   ),
                   builder: (context, pausasSnapshot) {
-                    final pausas = pausasSnapshot.data ?? <PausasRecord>[];
+                    final pausas = (pausasSnapshot.data ?? <PausasRecord>[])
+                        .where((p) =>
+                            p.inicioPausa != null &&
+                            !p.inicioPausa!.isBefore(startOfWindow))
+                        .toList();
                     return StreamBuilder<List<TurnosRecord>>(
                       stream: queryTurnosRecord(
                         queryBuilder: (q) => q
