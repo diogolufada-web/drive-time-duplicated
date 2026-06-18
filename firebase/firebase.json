@@ -13,7 +13,7 @@
     "rules": "storage.rules"
   },
   "hosting": {
-    "public": "../site",
+    "public": "public",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
   }
 }
