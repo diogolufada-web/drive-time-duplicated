@@ -18,13 +18,13 @@
       text-align: center;
       padding: 2rem 1rem 1rem;
     }
-    header h1 {
-      margin: 0;
-      font-size: 1.75rem;
-      letter-spacing: 0.04em;
+    .logo {
+      display: block;
+      width: min(240px, 80vw);
+      height: auto;
+      margin: 0 auto;
     }
-    header h1 span { color: var(--gold); }
-    header p { margin: 0.5rem 0 0; color: var(--muted); }
+    header p { margin: 0.75rem 0 0; color: var(--muted); }
     main {
       max-width: 720px;
       margin: 0 auto 3rem;
@@ -57,7 +57,7 @@
 </head>
 <body>
   <header>
-    <h1>DRIVE <span>TIME</span></h1>
+    <a href="index.html"><img src="logo.png" alt="Drive Time" class="logo" width="240" height="88"></a>
     <p>Política de Privacidade / Privacy Policy</p>
   </header>
   <main>

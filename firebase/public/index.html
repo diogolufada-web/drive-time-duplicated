@@ -20,9 +20,13 @@
       text-align: center;
       padding: 2rem 1.25rem;
     }
-    h1 { margin: 0; font-size: 2.25rem; letter-spacing: 0.05em; }
-    h1 span { color: var(--gold); }
-    p { max-width: 520px; line-height: 1.6; color: var(--muted); margin: 1rem auto 1.5rem; }
+    .logo {
+      display: block;
+      width: min(280px, 85vw);
+      height: auto;
+      margin: 0 auto;
+    }
+    p { max-width: 520px; line-height: 1.6; color: var(--muted); margin: 1.25rem auto 1.5rem; }
     nav a {
       display: inline-block;
       margin: 0.35rem 0.75rem;
@@ -35,7 +39,7 @@
   </style>
 </head>
 <body>
-  <h1>DRIVE <span>TIME</span></h1>
+  <img src="logo.png" alt="Drive Time" class="logo" width="280" height="103">
   <p>Aplicação de apoio ao registo de turnos, pausas e relatórios para motoristas TVDE em Portugal.</p>
   <nav>
     <a href="privacy-policy.html">Política de Privacidade</a>
