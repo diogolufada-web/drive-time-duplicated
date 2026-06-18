@@ -3,11 +3,12 @@ import '/backend/backend.dart';
 /// Computes the legally active shift duration in seconds for [turno],
 /// subtracting any pause intervals that fall within the shift window.
 ///
-/// - [allPausas] should be a superset of pauses that may belong to this turno;
-///   pauses are filtered by `turnoRef` (compared by document path) before being
-///   accounted for.
-/// - [referenceNow] is used as the end time when a shift (or a pause inside it)
-///   is still open. Defaults to `DateTime.now()`.
+/// - [allPausas] must include **all** pauses for the shift/day (open and closed).
+///   If only `ativo: true` pauses are passed, closed breaks are not subtracted
+///   and the timer will incorrectly include pause time after resume.
+/// - Pauses are filtered by `turnoRef` (compared by document path).
+/// - [referenceNow] is used as the end time when a shift (or an open pause) is
+///   still active. Defaults to `DateTime.now()`.
 int effectiveShiftSeconds(
   TurnosRecord turno,
   List<PausasRecord> allPausas, {
@@ -30,7 +31,8 @@ int effectiveShiftSeconds(
     if (p.turnoRef?.path != turnoPath) continue;
     final pStartRaw = p.inicioPausa;
     if (pStartRaw == null) continue;
-    final pEndRaw = p.fimPausa ?? end;
+    // Open pause: count until now (timer freezes). Closed: use fim_pausa only.
+    final pEndRaw = p.fimPausa ?? now;
 
     final pStart = pStartRaw.isBefore(start) ? start : pStartRaw;
     final pEnd = pEndRaw.isAfter(end) ? end : pEndRaw;

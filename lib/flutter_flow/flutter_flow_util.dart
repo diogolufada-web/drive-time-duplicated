@@ -303,6 +303,70 @@ String driveTimeTextLogoAsset(BuildContext context) {
 /// Apenas o simbolo DT dourado (sem texto). Universal entre temas.
 const String driveTimeMarkAsset = 'assets/images/drive_time_mark.png';
 
+/// Logotipo completo (DRIVE TIME + tagline) para login, registo e splash.
+Widget dtFullLogo(
+  BuildContext context, {
+  double maxWidth = 340.0,
+  double maxHeight = 200.0,
+}) {
+  return Center(
+    child: ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: maxWidth,
+        maxHeight: maxHeight,
+      ),
+      child: Image.asset(
+        driveTimeLogoAsset(context),
+        fit: BoxFit.contain,
+      ),
+    ),
+  );
+}
+
+/// Corpo scrollavel para ecras de autenticacao (teclado nao tapa campos).
+Widget dtAuthScrollBody({
+  required BuildContext context,
+  required List<Widget> children,
+  bool centerContent = true,
+  bool showFullLogo = true,
+}) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+      return SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(20.0, 12.0, 20.0, 24.0 + bottomInset),
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: centerContent ? constraints.maxHeight - 24.0 : 0,
+          ),
+          child: Column(
+            mainAxisAlignment: centerContent
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (showFullLogo) ...[
+                dtFullLogo(context),
+                const SizedBox(height: 20.0),
+              ],
+              ...children,
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+/// Logotipo completo no topo da Home (icone + DRIVE TIME + tagline).
+/// Usa [driveTimeLogoAsset] — dark/light conforme o tema activo.
+Widget dtHomeHeaderLogo(BuildContext context) => dtFullLogo(
+      context,
+      maxWidth: 260,
+      maxHeight: 96,
+    );
+
 /// Logotipo "DRIVE TIME" so texto, com tamanho normalizado para todas as
 /// paginas. Imagem tem aspect ratio ~10:1 (texto largo e baixo); por isso
 /// limitamos largura maxima e usamos uma altura modesta.
@@ -372,6 +436,13 @@ InputDecoration dtInputDecoration(
 // ---------------------------------------------------------------------------
 // Design system Drive Time - tokens partilhados
 // ---------------------------------------------------------------------------
+
+/// Fundo escuro da marca (splash e ecrãs escuros).
+const Color kDtBackground = Color(0xFF050505);
+
+/// Tamanho do logotipo no splash Flutter (centrado).
+const double kDtSplashLogoMaxWidth = 360.0;
+const double kDtSplashLogoMaxHeight = 180.0;
 
 /// Cor de acento principal (dourado).
 const Color kDtGold = Color(0xFFD4AF37);

@@ -5,6 +5,7 @@ import '/flutter_flow/flutter_flow_widgets.dart';
 import '/index.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'defenioespage_model.dart';
 export 'defenioespage_model.dart';
 
@@ -108,7 +109,7 @@ class _DefenioespageWidgetState extends State<DefenioespageWidget> {
                           LegalPageWidget.termsRouteName,
                         ),
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: 20),
                       FFButtonWidget(
                         onPressed: () async {
                           GoRouter.of(context).prepareAuthEvent();
@@ -119,23 +120,26 @@ class _DefenioespageWidgetState extends State<DefenioespageWidget> {
                             context.mounted,
                           );
                         },
-                        text: 'LOGOUT',
+                        text: tr('settings.signOut'),
                         options: FFButtonOptions(
                           width: double.infinity,
-                          height: 46,
+                          height: 44,
                           color: _accent,
                           textStyle: theme.titleSmall.override(
                             font: GoogleFonts.interTight(
                               fontWeight: FontWeight.bold,
                             ),
                             color: Colors.white,
-                            letterSpacing: 1.0,
+                            fontSize: 14,
+                            letterSpacing: 0.4,
                             fontWeight: FontWeight.bold,
                           ),
                           elevation: 0,
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
+                      const SizedBox(height: 24),
+                      _buildVersionLine(theme),
                     ],
                   ),
                 ),
@@ -145,6 +149,28 @@ class _DefenioespageWidgetState extends State<DefenioespageWidget> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildVersionLine(FlutterFlowTheme theme) {
+    return FutureBuilder<PackageInfo>(
+      future: PackageInfo.fromPlatform(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const SizedBox.shrink();
+        }
+        final info = snapshot.data!;
+        return Center(
+          child: Text(
+            '${tr('settings.appVersion')} ${info.version} (${info.buildNumber})',
+            style: theme.bodySmall.override(
+              font: GoogleFonts.inter(),
+              color: theme.secondaryText,
+              fontSize: 12,
+            ),
+          ),
+        );
+      },
     );
   }
 

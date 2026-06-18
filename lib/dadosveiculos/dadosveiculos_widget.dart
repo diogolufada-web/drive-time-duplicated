@@ -127,25 +127,19 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
           child: Scaffold(
             key: scaffoldKey,
             backgroundColor: theme.primaryBackground,
+            resizeToAvoidBottomInset: true,
             body: SafeArea(
               top: true,
-              child: Align(
-                alignment: AlignmentDirectional(0.0, 0.0),
-                child: Padding(
-                  padding: const EdgeInsets.all(22.0),
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    children: [
-                      dtTextLogo(context),
-                      const SizedBox(height: 12),
-                      dtSectionTitle(
-                        context,
-                        tr('form.vehicleTitle'),
-                        fontSize: 32,
-                      ),
-                      const SizedBox(height: 18),
-                      Container(
+              child: dtAuthScrollBody(
+                context: context,
+                children: [
+                  dtSectionTitle(
+                    context,
+                    tr('form.vehicleTitle'),
+                    fontSize: 32,
+                  ),
+                  const SizedBox(height: 18),
+                  Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 18),
                         decoration: dtCardDecoration(context),
@@ -261,8 +255,6 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
                         ),
                       ),
                     ],
-                  ),
-                ),
               ),
             ),
           ),

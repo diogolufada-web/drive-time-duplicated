@@ -77,16 +77,9 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
             ),
           );
         }
-        List<MotoristasRecord> dadosmotoristaMotoristasRecordList =
-            snapshot.data!;
-        // Return an empty Container when the item does not exist.
-        if (snapshot.data!.isEmpty) {
-          return Container();
-        }
-        final dadosmotoristaMotoristasRecord =
-            dadosmotoristaMotoristasRecordList.isNotEmpty
-                ? dadosmotoristaMotoristasRecordList.first
-                : null;
+        final dadosmotoristaMotoristasRecord = snapshot.data!.isNotEmpty
+            ? snapshot.data!.first
+            : null;
 
         return GestureDetector(
           onTap: () {
@@ -96,25 +89,18 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
           child: Scaffold(
             key: scaffoldKey,
             backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+            resizeToAvoidBottomInset: true,
             body: SafeArea(
               top: true,
-              child: Align(
-                alignment: AlignmentDirectional(0.0, 0.0),
-                child: Padding(
-                  padding: EdgeInsets.all(22.0),
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    children: [
-                      dtTextLogo(context),
-                      const SizedBox(height: 12.0),
-                      dtSectionTitle(
-                        context,
-                        tr('form.driverTitle'),
-                        fontSize: 32,
-                      ),
-                      Padding(
+              child: dtAuthScrollBody(
+                context: context,
+                children: [
+                  dtSectionTitle(
+                    context,
+                    tr('form.driverTitle'),
+                    fontSize: 32,
+                  ),
+                  Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 4.0, vertical: 18.0),
                         child: Container(
@@ -175,14 +161,6 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                     fontStyle: FlutterFlowTheme.of(context)
                                         .labelMedium
                                         .fontStyle,
-                                    shadows: [
-                                      Shadow(
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        offset: Offset(2.0, 2.0),
-                                        blurRadius: 2.0,
-                                      )
-                                    ],
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -248,7 +226,11 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                 key: ValueKey('email'),
                                 controller: _model.textController2 ??=
                                     TextEditingController(
-                                  text: dadosmotoristaMotoristasRecord?.email,
+                                  text: dadosmotoristaMotoristasRecord?.email
+                                          .isNotEmpty ==
+                                      true
+                                      ? dadosmotoristaMotoristasRecord!.email
+                                      : currentUserEmail,
                                 ),
                                 focusNode: _model.textFieldFocusNode2,
                                 autofocus: false,
@@ -290,14 +272,6 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                     fontStyle: FlutterFlowTheme.of(context)
                                         .labelMedium
                                         .fontStyle,
-                                    shadows: [
-                                      Shadow(
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        offset: Offset(2.0, 2.0),
-                                        blurRadius: 2.0,
-                                      )
-                                    ],
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -406,14 +380,6 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                     fontStyle: FlutterFlowTheme.of(context)
                                         .labelMedium
                                         .fontStyle,
-                                    shadows: [
-                                      Shadow(
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        offset: Offset(2.0, 2.0),
-                                        blurRadius: 2.0,
-                                      )
-                                    ],
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -526,14 +492,6 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                     fontStyle: FlutterFlowTheme.of(context)
                                         .labelMedium
                                         .fontStyle,
-                                    shadows: [
-                                      Shadow(
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        offset: Offset(2.0, 2.0),
-                                        blurRadius: 2.0,
-                                      )
-                                    ],
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -645,14 +603,6 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                     fontStyle: FlutterFlowTheme.of(context)
                                         .labelMedium
                                         .fontStyle,
-                                    shadows: [
-                                      Shadow(
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        offset: Offset(2.0, 2.0),
-                                        blurRadius: 2.0,
-                                      )
-                                    ],
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -725,16 +675,26 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                           .validate()) {
                                     return;
                                   }
-                                  await dadosmotoristaMotoristasRecord!
-                                      .reference
-                                      .update(createMotoristasRecordData(
+                                  final data = createMotoristasRecordData(
                                     nome: _model.textController1.text,
                                     telefone: _model.textController3.text,
-                                    email: _model.textController2.text,
+                                    email: _model.textController2.text.trim(),
                                     certeficadocmtvde:
                                         _model.textController4.text,
                                     nif: _model.textController5.text,
-                                  ));
+                                  );
+                                  if (dadosmotoristaMotoristasRecord != null) {
+                                    await dadosmotoristaMotoristasRecord
+                                        .reference
+                                        .update(data);
+                                  } else {
+                                    await MotoristasRecord.collection
+                                        .doc()
+                                        .set({
+                                      ...data,
+                                      'created_time': getCurrentTimestamp,
+                                    });
+                                  }
                                   if (!context.mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(content: Text(tr('form.saved'))),
@@ -779,14 +739,6 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                     fontStyle: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .fontStyle,
-                                    shadows: [
-                                      Shadow(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryText,
-                                        offset: Offset(2.0, 2.0),
-                                        blurRadius: 2.0,
-                                      )
-                                    ],
                                   ),
                                   elevation: 0.0,
                                   borderRadius: BorderRadius.circular(8.0),
@@ -828,14 +780,6 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                                     fontStyle: FlutterFlowTheme.of(context)
                                         .titleSmall
                                         .fontStyle,
-                                    shadows: [
-                                      Shadow(
-                                        color: FlutterFlowTheme.of(context)
-                                            .primaryText,
-                                        offset: Offset(2.0, 2.0),
-                                        blurRadius: 2.0,
-                                      )
-                                    ],
                                   ),
                                   elevation: 0.0,
                                   borderRadius: BorderRadius.circular(8.0),
@@ -849,9 +793,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
+                ],
               ),
             ),
           ),

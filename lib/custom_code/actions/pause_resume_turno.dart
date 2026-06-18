@@ -44,6 +44,14 @@ bool _estadoIndicaPausa(String? estado) {
   return e == 'pausa' || e == 'em_pausa' || e == 'empausa';
 }
 
+Future<void> _safeShiftNotification(Future<void> Function() action) async {
+  try {
+    await action();
+  } catch (e, st) {
+    debugPrint('pauseResumeTurno: notificação ignorada ($e)\n$st');
+  }
+}
+
 /// PAUSA / RETOMAR
 /// Parâmetro FlutterFlow: [turno] = Document (Turnos Record), ex. containerTurnosRecord
 Future<void> pauseResumeTurno(TurnosRecord? turno) async {
@@ -94,7 +102,9 @@ Future<void> pauseResumeTurno(TurnosRecord? turno) async {
         createTurnosRecordData(estado: 'pausa', ativo: true),
       );
       await batch.commit();
-      await NotificationsService.instance.pauseShiftAlerts();
+      await _safeShiftNotification(
+        () => NotificationsService.instance.pauseShiftAlerts(),
+      );
       _showSnack(tr('shift.pauseStarted'));
       return;
     }
@@ -112,7 +122,9 @@ Future<void> pauseResumeTurno(TurnosRecord? turno) async {
       createTurnosRecordData(estado: 'ativo', ativo: true),
     );
     await batch.commit();
-    await NotificationsService.instance.resumeShiftAlerts();
+    await _safeShiftNotification(
+      () => NotificationsService.instance.resumeShiftAlerts(),
+    );
     _showSnack(tr('shift.resumed'));
   } catch (e, st) {
     debugPrint('pauseResumeTurno error: $e\n$st');

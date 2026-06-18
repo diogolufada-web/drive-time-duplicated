@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Apenas fundo escuro: o logotipo fica só no splash Flutter (evita 2 imagens). -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/splash_background" />
-    <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@mipmap/ic_launcher" />
-    </item>
 </layer-list>

@@ -22,7 +22,15 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "email", "order": "ASCENDING" },
-        { "fieldPath": "ativo", "order": "ASCENDING" }
+        { "fieldPath": "data_dia", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "turnos",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "email", "order": "ASCENDING" },
+        { "fieldPath": "data_dia", "order": "ASCENDING" }
       ]
     }
   ],

@@ -3,6 +3,7 @@ import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
+import '/utils/error_messages.dart';
 import '/utils/shift_time.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -77,6 +78,28 @@ class _HistoricopageWidgetState extends State<HistoricopageWidget> {
                                 isGreaterThanOrEqualTo: startOfWindow),
                       ),
                       builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return ListView(
+                            padding:
+                                const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                            children: [
+                              _buildHeader(theme),
+                              const SizedBox(height: 40),
+                              Text(
+                                firestoreErrorMessage(snapshot.error),
+                                textAlign: TextAlign.center,
+                                style: theme.bodyMedium.override(
+                                  font: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  color: theme.error,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          );
+                        }
                         if (!snapshot.hasData) {
                           return const Center(
                             child: SizedBox(
@@ -90,6 +113,28 @@ class _HistoricopageWidgetState extends State<HistoricopageWidget> {
                           );
                         }
                         final turnos = snapshot.data!;
+                        if (turnos.isEmpty) {
+                          return ListView(
+                            padding:
+                                const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                            children: [
+                              _buildHeader(theme),
+                              const SizedBox(height: 40),
+                              Text(
+                                tr('history.emptyList'),
+                                textAlign: TextAlign.center,
+                                style: theme.bodyMedium.override(
+                                  font: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  color: theme.secondaryText,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          );
+                        }
                         final perDay =
                             _groupByDay(turnos, pausas, startOfToday);
                         final totalSeconds = perDay.values

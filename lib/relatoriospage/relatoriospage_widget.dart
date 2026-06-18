@@ -453,6 +453,12 @@ class _RelatoriospageWidgetState extends State<RelatoriospageWidget> {
                   motorista: motorista,
                   veiculo: veiculo,
                 );
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text(tr('reports.pdfError'))),
+                  );
+                }
               } finally {
                 if (mounted) safeSetState(() => _exporting = false);
               }

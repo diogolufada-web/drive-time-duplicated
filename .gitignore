@@ -12,6 +12,9 @@ ios/Flutter/ephemeral/
 *.pyc
 .DS_Store
 Thumbs.db
+dist/
+build-log.txt
+.cursor/
 local.properties
 key.properties
 android/upload-keystore.jks

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_auth/firebase_auth.dart';
+
+import '/utils/error_messages.dart';
 import 'package:flutter/material.dart';
 import '../auth_manager.dart';
 
@@ -70,9 +72,7 @@ class FirebaseAuthManager extends AuthManager
       if (e.code == 'requires-recent-login') {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Too long since most recent sign in. Sign in again before deleting your account.')),
+          SnackBar(content: Text(authErrorMessage(e))),
         );
       }
     }
@@ -93,9 +93,7 @@ class FirebaseAuthManager extends AuthManager
       if (e.code == 'requires-recent-login') {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'Too long since most recent sign in. Sign in again before updating your email.')),
+          SnackBar(content: Text(authErrorMessage(e))),
         );
       }
     }
@@ -116,7 +114,7 @@ class FirebaseAuthManager extends AuthManager
       if (e.code == 'requires-recent-login') {
         ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.message!}')),
+          SnackBar(content: Text(authErrorMessage(e))),
         );
       }
     }
@@ -132,13 +130,10 @@ class FirebaseAuthManager extends AuthManager
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.message!}')),
+        SnackBar(content: Text(authErrorMessage(e))),
       );
       return null;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Password reset email sent')),
-    );
   }
 
   @override
@@ -305,16 +300,9 @@ class FirebaseAuthManager extends AuthManager
           ? null
           : DriveTimeDuplicatedFirebaseUser.fromUserCredential(userCredential);
     } on FirebaseAuthException catch (e) {
-      final errorMsg = switch (e.code) {
-        'email-already-in-use' =>
-          'Error: The email is already in use by a different account',
-        'INVALID_LOGIN_CREDENTIALS' =>
-          'Error: The supplied auth credential is incorrect, malformed or has expired',
-        _ => 'Error: ${e.message!}',
-      };
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMsg)),
+        SnackBar(content: Text(authErrorMessage(e))),
       );
       return null;
     }

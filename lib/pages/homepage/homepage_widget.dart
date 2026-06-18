@@ -6,8 +6,9 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/custom_code/actions/index.dart';
-import '/flutter_flow/custom_functions.dart' as functions;
 import '/index.dart';
+import '/utils/error_messages.dart';
+import '/utils/shift_time.dart';
 import '/services/notifications_service.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
   bool _shiftBusy = false;
+  Timer? _clockTimer;
 
   bool _isShiftPausa(TurnosRecord turno) {
     final e = turno.estado.trim().toLowerCase();
@@ -72,7 +74,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
       }
       return fresh;
     } catch (e) {
-      _showShiftSnack(tr('home.shiftUpdateError'));
+      _showShiftSnack(firestoreErrorMessage(e));
       return null;
     }
   }
@@ -103,13 +105,34 @@ class _HomepageWidgetState extends State<HomepageWidget> {
       }
       safeSetState(() {});
     });
+    _clockTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) {
+        safeSetState(() {});
+      }
+    });
   }
 
   @override
   void dispose() {
+    _clockTimer?.cancel();
     _model.dispose();
 
     super.dispose();
+  }
+
+  String _formatTodayHours(
+    List<TurnosRecord> turnos,
+    List<PausasRecord> pausas,
+  ) {
+    var totalSeconds = 0;
+    for (final turno in turnos) {
+      totalSeconds += effectiveShiftSeconds(turno, pausas);
+    }
+    final hours = (totalSeconds ~/ 3600).toString().padLeft(2, '0');
+    final minutes =
+        ((totalSeconds % 3600) ~/ 60).toString().padLeft(2, '0');
+    final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
+    return '$hours:$minutes:$seconds';
   }
 
   Future<void> _onPauseResumePressed(TurnosRecord turno) async {
@@ -124,7 +147,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
       }
       await pauseResumeTurno(fresh);
     } catch (e) {
-      _showShiftSnack(tr('home.pauseResumeError'));
+      _showShiftSnack(firestoreErrorMessage(e));
     } finally {
       _shiftBusy = false;
       if (mounted) {
@@ -145,7 +168,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
       children: [
         Padding(
           padding: const EdgeInsetsDirectional.fromSTEB(12.0, 14.0, 12.0, 12.0),
-          child: dtTextLogo(context),
+          child: dtHomeHeaderLogo(context),
         ),
         _buildDriverHeaderCard(context, theme, hasName, driverName, matricula),
       ],
@@ -165,22 +188,11 @@ class _HomepageWidgetState extends State<HomepageWidget> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 10.0),
         decoration: dtCardDecoration(context),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(
-              driveTimeMarkAsset,
-              width: 102.0,
-              height: 102.0,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(width: 16.0),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  RichText(
+            RichText(
                     overflow: TextOverflow.ellipsis,
                     text: TextSpan(
                       style: theme.titleSmall.override(
@@ -215,10 +227,63 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                ],
-              ),
-            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMissingDriverProfile(BuildContext context) {
+    final theme = FlutterFlowTheme.of(context);
+    return Scaffold(
+      backgroundColor: theme.primaryBackground,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(child: dtHomeHeaderLogo(context)),
+              const SizedBox(height: 24.0),
+              Text(
+                tr('onboarding.missingDriverTitle'),
+                textAlign: TextAlign.center,
+                style: theme.headlineSmall.override(
+                  font: GoogleFonts.interTight(fontWeight: FontWeight.w700),
+                  color: theme.primaryText,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 12.0),
+              Text(
+                tr('onboarding.missingDriverBody'),
+                textAlign: TextAlign.center,
+                style: theme.bodyMedium.override(
+                  font: GoogleFonts.inter(),
+                  color: theme.secondaryText,
+                ),
+              ),
+              const SizedBox(height: 28.0),
+              FFButtonWidget(
+                onPressed: () =>
+                    context.pushNamed(DadosmotoristaWidget.routeName),
+                text: tr('onboarding.setupProfile'),
+                options: FFButtonOptions(
+                  width: double.infinity,
+                  height: 48.0,
+                  color: kDtGold,
+                  textStyle: theme.titleSmall.override(
+                    font: GoogleFonts.interTight(fontWeight: FontWeight.bold),
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  elevation: 0.0,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -256,7 +321,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
       }
       await stopTurno(fresh);
     } catch (e) {
-      _showShiftSnack(tr('home.stopError'));
+      _showShiftSnack(firestoreErrorMessage(e));
     } finally {
       _shiftBusy = false;
       if (mounted) {
@@ -294,13 +359,10 @@ class _HomepageWidgetState extends State<HomepageWidget> {
           );
         }
         List<MotoristasRecord> homepageMotoristasRecordList = snapshot.data!;
-        // Return an empty Container when the item does not exist.
         if (snapshot.data!.isEmpty) {
-          return Container();
+          return _buildMissingDriverProfile(context);
         }
-        final homepageMotoristasRecord = homepageMotoristasRecordList.isNotEmpty
-            ? homepageMotoristasRecordList.first
-            : null;
+        final homepageMotoristasRecord = homepageMotoristasRecordList.first;
 
         return GestureDetector(
           onTap: () {
@@ -321,7 +383,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                         children: [
                           _buildDriverHeader(
                             context,
-                            driverName: homepageMotoristasRecord!.nome,
+                            driverName: homepageMotoristasRecord.nome,
                           ),
                           const SizedBox(height: 12.0),
                           Padding(
@@ -359,14 +421,6 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                             FlutterFlowTheme.of(context)
                                                 .bodyMedium
                                                 .fontStyle,
-                                        shadows: [
-                                          Shadow(
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                            offset: Offset(2.0, 2.0),
-                                            blurRadius: 2.0,
-                                          )
-                                        ],
                                       ),
                                     ),
                                   ),
@@ -396,15 +450,6 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                               FlutterFlowTheme.of(context)
                                                   .bodyMedium
                                                   .fontStyle,
-                                          shadows: [
-                                            Shadow(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
-                                              offset: Offset(2.0, 2.0),
-                                              blurRadius: 2.0,
-                                            )
-                                          ],
                                         ),
                                       ),
                                     ),
@@ -424,12 +469,50 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                       isEqualTo: currentUserEmail,
                                     )
                                     .where(
-                                      'ativo',
-                                      isEqualTo: true,
+                                      'data_dia',
+                                      isEqualTo: dateTimeFormat(
+                                        'yyyy-MM-dd',
+                                        getCurrentTimestamp,
+                                      ),
                                     ),
-                                singleRecord: true,
                               ),
-                              builder: (context, snapshot) {
+                              builder: (context, todayTurnosSnap) {
+                                final todayTurnos =
+                                    todayTurnosSnap.data ?? <TurnosRecord>[];
+                                return StreamBuilder<List<PausasRecord>>(
+                                  stream: queryPausasRecord(
+                                    queryBuilder: (pausasRecord) =>
+                                        pausasRecord
+                                            .where(
+                                              'email',
+                                              isEqualTo: currentUserEmail,
+                                            )
+                                            .where(
+                                              'data_dia',
+                                              isEqualTo: dateTimeFormat(
+                                                'yyyy-MM-dd',
+                                                getCurrentTimestamp,
+                                              ),
+                                            ),
+                                  ),
+                                  builder: (context, pausasSnap) {
+                                    final pausasList = pausasSnap.data ??
+                                        <PausasRecord>[];
+                                    return StreamBuilder<List<TurnosRecord>>(
+                                      stream: queryTurnosRecord(
+                                        queryBuilder: (turnosRecord) =>
+                                            turnosRecord
+                                                .where(
+                                                  'email',
+                                                  isEqualTo: currentUserEmail,
+                                                )
+                                                .where(
+                                                  'ativo',
+                                                  isEqualTo: true,
+                                                ),
+                                        singleRecord: true,
+                                      ),
+                                      builder: (context, snapshot) {
                                 // Customize what your widget looks like when it's loading.
                                 if (!snapshot.hasData) {
                                   return Center(
@@ -455,58 +538,19 @@ class _HomepageWidgetState extends State<HomepageWidget> {
 
                                 return Container(
                                   width: double.infinity,
-                                  height: 291.8,
                                   decoration: dtCardDecoration(context),
                                         child: Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: SingleChildScrollView(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                          padding: const EdgeInsets.fromLTRB(
+                                            12.0,
+                                            10.0,
+                                            12.0,
+                                            10.0,
+                                          ),
+                                          child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
                                               children: [
-                                                Text(
-                                                  valueOrDefault<String>(
-                                                    _model
-                                                        .veiculodoc?.matricula,
-                                                    '__-__-__',
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                  style: FlutterFlowTheme.of(
-                                                          context)
-                                                      .bodyMedium
-                                                      .override(
-                                                    font: GoogleFonts.inter(
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontStyle:
-                                                          FlutterFlowTheme.of(
-                                                                  context)
-                                                              .bodyMedium
-                                                              .fontStyle,
-                                                    ),
-                                                    color: Color(0xFFD4AF37),
-                                                    fontSize: 18.0,
-                                                    letterSpacing: 1.2,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontStyle:
-                                                        FlutterFlowTheme.of(
-                                                                context)
-                                                            .bodyMedium
-                                                            .fontStyle,
-                                                    shadows: [
-                                                      Shadow(
-                                                        color:
-                                                            FlutterFlowTheme.of(
-                                                                    context)
-                                                                .secondaryText,
-                                                        offset:
-                                                            Offset(2.0, 2.0),
-                                                        blurRadius: 2.0,
-                                                      )
-                                                    ],
-                                                  ),
-                                                ),
                                                 Padding(
                                                   padding: EdgeInsets.all(4.0),
                                                   child: Text(
@@ -533,16 +577,6 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                                   context)
                                                               .bodyMedium
                                                               .fontStyle,
-                                                      shadows: [
-                                                        Shadow(
-                                                          color: FlutterFlowTheme
-                                                                  .of(context)
-                                                              .secondaryText,
-                                                          offset:
-                                                              Offset(2.0, 2.0),
-                                                          blurRadius: 2.0,
-                                                        )
-                                                      ],
                                                     ),
                                                   ),
                                                 ),
@@ -550,153 +584,23 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                   alignment:
                                                       AlignmentDirectional(
                                                           0.0, 0.0),
-                                                  child: Container(
-                                                    width: 239.4,
-                                                    height: 44.59,
-                                                    decoration: BoxDecoration(
-                                                      color: FlutterFlowTheme
-                                                              .of(context)
-                                                          .secondaryBackground,
+                                                  child: Text(
+                                                    _formatTodayHours(
+                                                      todayTurnos,
+                                                      pausasList,
                                                     ),
-                                                    alignment:
-                                                        AlignmentDirectional(
-                                                            0.0, 0.0),
-                                                    child: StreamBuilder<
-                                                        List<TurnosRecord>>(
-                                                      stream: queryTurnosRecord(
-                                                        queryBuilder:
-                                                            (turnosRecord) =>
-                                                                turnosRecord
-                                                                    .where(
-                                                                      'email',
-                                                                      isEqualTo:
-                                                                          currentUserEmail,
-                                                                    )
-                                                                    .where(
-                                                                      'ativo',
-                                                                      isEqualTo:
-                                                                          true,
-                                                                    ),
+                                                    style: FlutterFlowTheme.of(
+                                                            context)
+                                                        .bodyMedium
+                                                        .override(
+                                                      font: GoogleFonts.inter(
+                                                        fontWeight:
+                                                            FontWeight.w600,
                                                       ),
-                                                      builder:
-                                                          (context, snapshot) {
-                                                        // Customize what your widget looks like when it's loading.
-                                                        if (!snapshot.hasData) {
-                                                          return Center(
-                                                            child: SizedBox(
-                                                              width: 50.0,
-                                                              height: 50.0,
-                                                              child:
-                                                                  CircularProgressIndicator(
-                                                                valueColor:
-                                                                    AlwaysStoppedAnimation<
-                                                                        Color>(
-                                                                  FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .primary,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          );
-                                                        }
-                                                        List<TurnosRecord>
-                                                            containerTurnosRecordList =
-                                                            snapshot.data!;
-
-                                                        return Container(
-                                                          width: 284.5,
-                                                          height: 67.8,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: FlutterFlowTheme
-                                                                    .of(context)
-                                                                .secondaryBackground,
-                                                          ),
-                                                          child: Align(
-                                                            alignment:
-                                                                AlignmentDirectional(
-                                                                    0.0, 0.0),
-                                                            child: StreamBuilder<
-                                                                List<
-                                                                    PausasRecord>>(
-                                                              stream:
-                                                                  queryPausasRecord(
-                                                                queryBuilder:
-                                                                    (pausasRecord) =>
-                                                                        pausasRecord
-                                                                            .where(
-                                                                              'email',
-                                                                              isEqualTo: currentUserEmail,
-                                                                            )
-                                                                            .where(
-                                                                              'ativo',
-                                                                              isEqualTo: true,
-                                                                            ),
-                                                              ),
-                                                              builder: (context,
-                                                                  snapshot) {
-                                                                // Customize what your widget looks like when it's loading.
-                                                                if (!snapshot
-                                                                    .hasData) {
-                                                                  return Center(
-                                                                    child:
-                                                                        SizedBox(
-                                                                      width:
-                                                                          50.0,
-                                                                      height:
-                                                                          50.0,
-                                                                      child:
-                                                                          CircularProgressIndicator(
-                                                                        valueColor:
-                                                                            AlwaysStoppedAnimation<Color>(
-                                                                          FlutterFlowTheme.of(context)
-                                                                              .primary,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  );
-                                                                }
-                                                                List<PausasRecord>
-                                                                    textPausasRecordList =
-                                                                    snapshot
-                                                                        .data!;
-
-                                                                return Text(
-                                                                  functions.calculahorashoje(
-                                                                      containerTurnosRecordList
-                                                                          .toList(),
-                                                                      textPausasRecordList
-                                                                          .toList()),
-                                                                  style: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .bodyMedium
-                                                                      .override(
-                                                                        font: GoogleFonts
-                                                                            .inter(
-                                                                          fontWeight: FlutterFlowTheme.of(context)
-                                                                              .bodyMedium
-                                                                              .fontWeight,
-                                                                          fontStyle: FlutterFlowTheme.of(context)
-                                                                              .bodyMedium
-                                                                              .fontStyle,
-                                                                        ),
-                                                                        fontSize:
-                                                                            20.0,
-                                                                        letterSpacing:
-                                                                            0.0,
-                                                                        fontWeight: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium
-                                                                            .fontWeight,
-                                                                        fontStyle: FlutterFlowTheme.of(context)
-                                                                            .bodyMedium
-                                                                            .fontStyle,
-                                                                      ),
-                                                                );
-                                                              },
-                                                            ),
-                                                          ),
-                                                        );
-                                                      },
+                                                      fontSize: 20.0,
+                                                      letterSpacing: 0.0,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                     ),
                                                   ),
                                                 ),
@@ -854,7 +758,43 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                         );
                                                       }
 
-                                                      return Padding(
+                                                      return Column(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                              horizontal: 10.0,
+                                                              vertical: 4.0,
+                                                            ),
+                                                            child: Text(
+                                                              tr('home.noActiveShift'),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: FlutterFlowTheme
+                                                                      .of(context)
+                                                                  .bodyMedium
+                                                                  .override(
+                                                                font: GoogleFonts
+                                                                    .inter(
+                                                                  fontSize:
+                                                                      14.0,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                ),
+                                                                color: FlutterFlowTheme
+                                                                        .of(context)
+                                                                    .secondaryText,
+                                                                letterSpacing:
+                                                                    0.0,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Padding(
                                                         padding:
                                                             EdgeInsets.all(
                                                                 10.0),
@@ -983,19 +923,6 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                                           context)
                                                                       .titleSmall
                                                                       .fontStyle,
-                                                              shadows: [
-                                                                Shadow(
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  offset: Offset(
-                                                                    2.0,
-                                                                    2.0,
-                                                                  ),
-                                                                  blurRadius:
-                                                                      2.0,
-                                                                )
-                                                              ],
                                                             ),
                                                             elevation: 0.0,
                                                             borderRadius:
@@ -1005,35 +932,27 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                             ),
                                                           ),
                                                         ),
+                                                      ),
+                                                        ],
                                                       );
                                                     },
                                                   ),
                                                 if (containerTurnosRecord !=
                                                     null)
-                                                  StreamBuilder<
-                                                      List<PausasRecord>>(
-                                                    stream: queryPausasRecord(
-                                                      queryBuilder: (q) => q
-                                                          .where(
-                                                            'email',
-                                                            isEqualTo:
-                                                                currentUserEmail,
-                                                          )
-                                                          .where(
-                                                            'turno_ref',
-                                                            isEqualTo:
-                                                                containerTurnosRecord
-                                                                    .reference,
-                                                          )
-                                                          .where(
-                                                            'ativo',
-                                                            isEqualTo: true,
-                                                          ),
-                                                    ),
-                                                    builder: (context,
-                                                        pausaSnap) {
+                                                  Builder(
+                                                    builder: (context) {
                                                       final activePausas =
-                                                          pausaSnap.data ?? [];
+                                                          pausasList
+                                                              .where(
+                                                                (p) =>
+                                                                    p.ativo &&
+                                                                    p.turnoRef
+                                                                            ?.path ==
+                                                                        containerTurnosRecord
+                                                                            .reference
+                                                                            .path,
+                                                              )
+                                                              .toList();
                                                       final showRetomar =
                                                           _showRetomarLabel(
                                                         containerTurnosRecord,
@@ -1109,19 +1028,6 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                                           context)
                                                                       .titleSmall
                                                                       .fontStyle,
-                                                              shadows: [
-                                                                Shadow(
-                                                                  color: FlutterFlowTheme.of(
-                                                                          context)
-                                                                      .secondaryText,
-                                                                  offset: Offset(
-                                                                    2.0,
-                                                                    2.0,
-                                                                  ),
-                                                                  blurRadius:
-                                                                      2.0,
-                                                                )
-                                                              ],
                                                             ),
                                                             elevation: 0.0,
                                                             borderRadius:
@@ -1152,17 +1058,19 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                         padding:
                                                             EdgeInsetsDirectional
                                                                 .fromSTEB(
-                                                                    16.0,
-                                                                    0.0,
-                                                                    16.0,
-                                                                    0.0),
+                                                          16.0,
+                                                          0.0,
+                                                          16.0,
+                                                          0.0,
+                                                        ),
                                                         iconPadding:
                                                             EdgeInsetsDirectional
                                                                 .fromSTEB(
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0,
-                                                                    0.0),
+                                                          0.0,
+                                                          0.0,
+                                                          0.0,
+                                                          0.0,
+                                                        ),
                                                         color:
                                                             Color(0xFFD4AF37),
                                                         textStyle:
@@ -1174,32 +1082,12 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                               .interTight(
                                                             fontWeight:
                                                                 FontWeight.bold,
-                                                            fontStyle:
-                                                                FlutterFlowTheme.of(
-                                                                        context)
-                                                                    .titleSmall
-                                                                    .fontStyle,
                                                           ),
                                                           color:
                                                               Color(0xFF7E1F25),
                                                           letterSpacing: 0.0,
                                                           fontWeight:
                                                               FontWeight.bold,
-                                                          fontStyle:
-                                                              FlutterFlowTheme.of(
-                                                                      context)
-                                                                  .titleSmall
-                                                                  .fontStyle,
-                                                          shadows: [
-                                                            Shadow(
-                                                              color: FlutterFlowTheme
-                                                                      .of(context)
-                                                                  .secondaryText,
-                                                              offset: Offset(
-                                                                  2.0, 2.0),
-                                                              blurRadius: 2.0,
-                                                            )
-                                                          ],
                                                         ),
                                                         elevation: 0.0,
                                                         borderRadius:
@@ -1211,12 +1099,15 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                               ],
                                             ),
                                           ),
-                                        ),
+                                );
+                                      },
                                     );
                                   },
-                                ),
-                              ),
-                              const SizedBox(height: 96.0),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 96.0),
                             ],
                           ),
                         ),
@@ -1266,14 +1157,6 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                       fontStyle: FlutterFlowTheme.of(context)
                                           .bodyMedium
                                           .fontStyle,
-                                      shadows: [
-                                        Shadow(
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryText,
-                                          offset: Offset(2.0, 2.0),
-                                          blurRadius: 2.0,
-                                        )
-                                      ],
                                     ),
                                   ),
                                 ],
@@ -1321,14 +1204,6 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                         fontStyle: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .fontStyle,
-                                        shadows: [
-                                          Shadow(
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                            offset: Offset(2.0, 2.0),
-                                            blurRadius: 2.0,
-                                          )
-                                        ],
                                       ),
                                     ),
                                   ],
@@ -1377,14 +1252,6 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                         fontStyle: FlutterFlowTheme.of(context)
                                             .bodyMedium
                                             .fontStyle,
-                                        shadows: [
-                                          Shadow(
-                                            color: FlutterFlowTheme.of(context)
-                                                .secondaryText,
-                                            offset: Offset(2.0, 2.0),
-                                            blurRadius: 2.0,
-                                          )
-                                        ],
                                       ),
                                     ),
                                   ],
@@ -1437,15 +1304,6 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                               FlutterFlowTheme.of(context)
                                                   .bodyMedium
                                                   .fontStyle,
-                                          shadows: [
-                                            Shadow(
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .secondaryText,
-                                              offset: Offset(2.0, 2.0),
-                                              blurRadius: 2.0,
-                                            )
-                                          ],
                                         ),
                                       ),
                                     ],

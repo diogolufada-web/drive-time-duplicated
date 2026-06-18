@@ -53,6 +53,14 @@ Future<List<PausasRecord>> _allPausasForTurno(
   );
 }
 
+Future<void> _safeShiftNotification(Future<void> Function() action) async {
+  try {
+    await action();
+  } catch (e, st) {
+    debugPrint('stopTurno: notificação ignorada ($e)\n$st');
+  }
+}
+
 /// STOP
 /// Parâmetro FlutterFlow: [turno] = Document (Turnos Record), ex. containerTurnosRecord
 Future<void> stopTurno(TurnosRecord? turno) async {
@@ -106,7 +114,9 @@ Future<void> stopTurno(TurnosRecord? turno) async {
       ),
     );
     await batch.commit();
-    await NotificationsService.instance.cancelShiftAlerts();
+    await _safeShiftNotification(
+      () => NotificationsService.instance.cancelShiftAlerts(),
+    );
     _showSnack(tr('shift.stopped'));
   } catch (e, st) {
     debugPrint('stopTurno error: $e\n$st');
