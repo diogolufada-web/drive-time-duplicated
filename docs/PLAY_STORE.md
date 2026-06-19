@@ -8,7 +8,8 @@ Usa isto enquanto a Google valida a identidade da conta Developer.
 |----------|-----|
 | `dist/DriveTime-1.0.0-build9.aab` | Upload na Play Console |
 | `play-store/icon-512.png` | Ícone da loja (512×512) |
-| `play-store/feature-graphic-1024x500.png` | Imagem de destaque |
+| `play-store/feature-graphic-1024x500.png` | Imagem de destaque (versão split) |
+| `play-store/feature-graphic-split.png` | Mesma versão split (alternativa) |
 | Capturas de ecrã do telemóvel | Mín. 2 (home, histórico, etc.) — **tu tiras no telemóvel** |
 
 ## Dados fixos
