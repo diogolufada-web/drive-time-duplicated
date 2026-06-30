@@ -1,32 +1,104 @@
-# Drive Time — Play Store (checklist)
+# Drive Time — Play Store (guia completo)
 
-Usa isto enquanto a Google valida a identidade da conta Developer.
+Conta: **admin@drivetimeapp.com** · Programador: **DTerrível**  
+App: **Drive Time** · Pacote: **pt.drivetime.app** · Preço: **19 €** (paga, vitalício)  
+AAB: `dist/DriveTime-1.0.0-build10.aab` · Versão **1.0.0 (10)**
 
-## Ficheiros prontos
+---
+
+## Ficheiros no PC
 
 | Ficheiro | Uso |
 |----------|-----|
-| `dist/DriveTime-1.0.0-build9.aab` | Upload na Play Console |
-| `play-store/icon-512.png` | Ícone da loja (512×512) |
-| `play-store/feature-graphic-1024x500.png` | Imagem de destaque (versão split) |
-| `play-store/feature-graphic-split.png` | Mesma versão split (alternativa) |
-| Capturas de ecrã do telemóvel | Mín. 2 (home, histórico, etc.) — **tu tiras no telemóvel** |
+| `dist/DriveTime-1.0.0-build10.aab` | Upload Play Console |
+| `play-store/icon-512.png` | Ícone 512×512 |
+| `play-store/feature-graphic-1024x500.png` | Imagem destaque |
+| Capturas de ecrã (telefone) | Mín. 2 |
 
-## Dados fixos
+---
 
-| Campo | Valor |
-|-------|--------|
-| Nome da app | Drive Time |
-| Package | `pt.drivetime.app` |
-| Versão | 1.0.0 (9) |
-| Email | admin@drivetimeapp.com |
-| Política de privacidade | https://drive-time-da85f.web.app/privacy-policy.html |
-| Categoria | Produtividade ou Ferramentas |
-| Gratuita | Sim |
+## Ordem recomendada (13 tarefas do painel)
 
-## Ficha da loja — copiar
+### 1. Política de privacidade
+**Painel → Defina a Política de Privacidade**
 
-**Descrição curta (máx. 80 caracteres):**
+```
+https://drive-time-da85f.web.app/privacy-policy.html
+```
+
+Guardar.
+
+---
+
+### 2. Detalhes de início de sessão
+- A app **requer** início de sessão? **Sim**
+- Como: **email + palavra-passe** (Firebase Auth)
+- Existe registo na app? **Sim**
+- Credenciais de teste para revisores? **Opcional** — podes criar conta teste `reviewer@drivetimeapp.com` ou deixar nota com credenciais temporárias
+- Restrições especiais (2FA empresa, etc.)? **Não**
+
+---
+
+### 3. Anúncios
+- A app contém anúncios? **Não**
+
+---
+
+### 4. Classificação de conteúdo
+Questionário IARC — respostas típicas:
+- Violência, sexualidade, drogas, jogos de azar: **Não**
+- Partilha localização / compras na app: **Não** (compra é preço da app na loja, não IAP)
+- Email, nome: **Sim** (funcionalidade)
+- Resultado esperado: classificação baixa (PEGI 3 / Todos)
+
+---
+
+### 5. Público-alvo
+- Destinada a crianças? **Não**
+- Grupo etário: **18 anos ou mais** (motoristas profissionais)
+
+---
+
+### 6. Segurança dos dados (Data safety)
+| Pergunta | Resposta |
+|----------|----------|
+| Recolhe dados? | Sim |
+| Encriptação em trânsito | Sim |
+| Pedido de eliminação | Sim — email admin@drivetimeapp.com |
+| Venda a terceiros / marketing | Não |
+| Tipos | Email, nome, NIF, telefone, veículo, turnos/pausas, idioma/tema |
+| Finalidade | Funcionalidade da app, gestão de conta |
+| Contacto privacidade | admin@drivetimeapp.com |
+
+---
+
+### 7. Apps governamentais
+- App governamental? **Não**
+
+---
+
+### 8. Funcionalidades financeiras
+- App bancária / pagamentos / crypto? **Não**  
+  (registo de horas TVDE não é serviço financeiro)
+
+---
+
+### 9. Saúde
+- App de saúde? **Não**
+
+---
+
+### 10. Categoria e contacto
+- Categoria: **Produtividade** ou **Ferramentas**
+- Email: **admin@drivetimeapp.com**
+- Site (opcional): https://drive-time-da85f.web.app/
+
+---
+
+### 11. Ficha da loja
+**Aumentar número de utilizadores → Presença na loja → Ficha da loja principal**
+
+**Descrição curta:**
 ```
 Registo de turnos, pausas e relatórios para motoristas TVDE.
 ```
@@ -50,36 +122,37 @@ A app ajuda-te a organizar os teus registos de forma simples e profissional. Os 
 Suporte: admin@drivetimeapp.com
 ```
 
-**Notas da versão (1.0.0):**
+Upload: ícone, imagem destaque, 2+ capturas de ecrã.
+
+---
+
+### 12. Conta de comerciante + preço 19 €
+**Obrigatório para app paga.**
+
+1. Painel → **Criar uma conta de comerciante** (ou Definições → pagamentos)
+2. IBAN, morada fiscal, NIF — dados da entidade que recebe
+3. Depois: **Monetização** ou **Preços da app** → **Paga** → **19,00 €** (Portugal)
+
+---
+
+### 13. Upload AAB (testes internos)
+**Testar e lançar → Testes → Testes internos → Criar versão**
+
+- Upload: `DriveTime-1.0.0-build10.aab`
+- Notas da versão:
 ```
-Primeira versão — registo de turnos, pausas, histórico e relatórios PDF para motoristas TVDE.
+Primeira versão — registo de turnos, pausas, histórico e relatórios PDF. Fecho automático de turno às 24h.
 ```
+- **Rever versão** → **Implementar nos testes internos**
 
-## Data safety (respostas)
+---
 
-- Recolhe dados: **Sim**
-- Encriptação em trânsito: **Sim**
-- Utilizador pode pedir eliminação: **Sim**
-- Venda/partilha para marketing: **Não**
-- Dados: email, nome, NIF, telefone, veículo, turnos/pausas, preferências app
-- Contacto: admin@drivetimeapp.com
+## Depois dos testes internos
+1. Testes fechados (opcional, 12+ testers)
+2. **Candidatar-se à produção**
+3. **Produção** → nova versão ou promover → publicar
 
-## Ordem na Play Console
+---
 
-1. **Store presence** → Main store listing (textos + gráficos)
-2. **App content** → Privacy policy (URL acima)
-3. **App content** → Data safety
-4. **App content** → Content rating (questionário — sem violência/compras)
-5. **App content** → Target audience → 18+
-6. **Test and release** → Internal testing → upload `DriveTime-1.0.0-build9.aab`
-7. Quando identidade aprovada → **Review release** → **Start rollout**
-
-## Capturas de ecrã (faz no telemóvel)
-
-Sugestão de 4 ecrãs:
-1. Home com timer
-2. Histórico
-3. Relatórios PDF
-4. Definições / dados motorista
-
-Tamanho: screenshots do teu telemóvel (Play aceita vários formatos).
+## Verificação pacote
+Ao criar a app, nome do pacote: **pt.drivetime.app** (não alterável depois).
