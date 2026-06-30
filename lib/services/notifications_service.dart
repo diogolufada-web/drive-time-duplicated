@@ -82,7 +82,6 @@ class NotificationsService {
         AndroidFlutterLocalNotificationsPlugin>();
     if (android != null) {
       await android.requestNotificationsPermission();
-      await android.requestExactAlarmsPermission();
     }
 
     final ios = _plugin.resolvePlatformSpecificImplementation<
@@ -207,6 +206,9 @@ class NotificationsService {
     if (!when.isAfter(now)) return;
 
     final tzWhen = tz.TZDateTime.from(when, tz.local);
+    // Usamos alarmes inexatos: a Drive Time nao e elegivel para alarmes exatos
+    // (USE_EXACT_ALARM) na Google Play. Os alertas podem variar alguns minutos,
+    // o que e aceitavel para avisos de tempo de conducao.
     try {
       await _plugin.zonedSchedule(
         id,
@@ -214,27 +216,12 @@ class NotificationsService {
         body,
         tzWhen,
         _details(title: title, body: body),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation.absoluteTime,
       );
     } catch (e) {
-      // Em emuladores sem permissão de alarme exato, faz fallback para inexato.
-      debugPrint('NotificationsService: falha alarme exato ($e). A tentar inexato.');
-      try {
-        await _plugin.zonedSchedule(
-          id,
-          title,
-          body,
-          tzWhen,
-          _details(title: title, body: body),
-          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-        );
-      } catch (e2) {
-        debugPrint('NotificationsService: agendamento falhou: $e2');
-      }
+      debugPrint('NotificationsService: agendamento falhou: $e');
     }
   }
 }
