@@ -41,6 +41,8 @@ class _HomepageWidgetState extends State<HomepageWidget> {
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
   bool _shiftBusy = false;
+  bool _autoStopInProgress = false;
+  String? _autoStopTurnoId;
   Timer? _clockTimer;
 
   bool _isShiftPausa(TurnosRecord turno) {
@@ -123,9 +125,17 @@ class _HomepageWidgetState extends State<HomepageWidget> {
   String _formatTodayHours(
     List<TurnosRecord> turnos,
     List<PausasRecord> pausas,
+    TurnosRecord? activeTurno,
   ) {
+    final turnosByPath = <String, TurnosRecord>{
+      for (final turno in turnos) turno.reference.path: turno,
+    };
+    if (activeTurno != null) {
+      turnosByPath[activeTurno.reference.path] = activeTurno;
+    }
+
     var totalSeconds = 0;
-    for (final turno in turnos) {
+    for (final turno in turnosByPath.values) {
       totalSeconds += effectiveShiftSeconds(turno, pausas);
     }
     final hours = (totalSeconds ~/ 3600).toString().padLeft(2, '0');
@@ -133,6 +143,38 @@ class _HomepageWidgetState extends State<HomepageWidget> {
         ((totalSeconds % 3600) ~/ 60).toString().padLeft(2, '0');
     final seconds = (totalSeconds % 60).toString().padLeft(2, '0');
     return '$hours:$minutes:$seconds';
+  }
+
+  void _scheduleAutoStopIfNeeded(TurnosRecord? turno) {
+    if (turno == null || !turno.ativo || _shiftBusy || _autoStopInProgress) {
+      return;
+    }
+    if (!isShiftExpired(turno)) {
+      return;
+    }
+    if (_autoStopTurnoId == turno.reference.id) {
+      return;
+    }
+    _autoStopTurnoId = turno.reference.id;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted || _autoStopInProgress) {
+        return;
+      }
+      _autoStopInProgress = true;
+      _shiftBusy = true;
+      try {
+        final stopped = await autoStopTurnoIfExpired(turno);
+        if (!stopped) {
+          _autoStopTurnoId = null;
+        }
+      } finally {
+        _autoStopInProgress = false;
+        _shiftBusy = false;
+        if (mounted) {
+          safeSetState(() {});
+        }
+      }
+    });
   }
 
   Future<void> _onPauseResumePressed(TurnosRecord turno) async {
@@ -482,22 +524,14 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                 return StreamBuilder<List<PausasRecord>>(
                                   stream: queryPausasRecord(
                                     queryBuilder: (pausasRecord) =>
-                                        pausasRecord
-                                            .where(
-                                              'email',
-                                              isEqualTo: currentUserEmail,
-                                            )
-                                            .where(
-                                              'data_dia',
-                                              isEqualTo: dateTimeFormat(
-                                                'yyyy-MM-dd',
-                                                getCurrentTimestamp,
-                                              ),
-                                            ),
+                                        pausasRecord.where(
+                                          'email',
+                                          isEqualTo: currentUserEmail,
+                                        ),
                                   ),
                                   builder: (context, pausasSnap) {
-                                    final pausasList = pausasSnap.data ??
-                                        <PausasRecord>[];
+                                    final allPausas =
+                                        pausasSnap.data ?? <PausasRecord>[];
                                     return StreamBuilder<List<TurnosRecord>>(
                                       stream: queryTurnosRecord(
                                         queryBuilder: (turnosRecord) =>
@@ -535,6 +569,27 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                     containerTurnosRecordList.isNotEmpty
                                         ? containerTurnosRecordList.first
                                         : null;
+
+                                final todayStr = dateTimeFormat(
+                                  'yyyy-MM-dd',
+                                  getCurrentTimestamp,
+                                );
+                                final activePath =
+                                    containerTurnosRecord?.reference.path;
+                                final pausasList = allPausas.where((p) {
+                                  if (p.dataDia == todayStr) {
+                                    return true;
+                                  }
+                                  if (activePath != null &&
+                                      p.turnoRef?.path == activePath) {
+                                    return true;
+                                  }
+                                  return false;
+                                }).toList();
+
+                                _scheduleAutoStopIfNeeded(
+                                  containerTurnosRecord,
+                                );
 
                                 return Container(
                                   width: double.infinity,
@@ -588,6 +643,7 @@ class _HomepageWidgetState extends State<HomepageWidget> {
                                                     _formatTodayHours(
                                                       todayTurnos,
                                                       pausasList,
+                                                      containerTurnosRecord,
                                                     ),
                                                     style: FlutterFlowTheme.of(
                                                             context)

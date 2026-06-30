@@ -61,16 +61,14 @@ Future<void> _safeShiftNotification(Future<void> Function() action) async {
   }
 }
 
-/// STOP
-/// Parâmetro FlutterFlow: [turno] = Document (Turnos Record), ex. containerTurnosRecord
-Future<void> stopTurno(TurnosRecord? turno) async {
-  if (turno == null) {
-    _showSnack(tr('shift.noActive'));
-    return;
-  }
+Future<bool> _finalizeTurno(
+  TurnosRecord turno, {
+  required DateTime endTime,
+  required String successMessage,
+}) async {
   if (currentUserEmail.isEmpty) {
     _showSnack(tr('shift.notAuthenticated'));
-    return;
+    return false;
   }
 
   final turnoRef = turno.reference;
@@ -78,22 +76,20 @@ Future<void> stopTurno(TurnosRecord? turno) async {
   try {
     final fresh = await TurnosRecord.getDocumentOnce(turnoRef);
     if (!fresh.ativo) {
-      _showSnack(tr('home.shiftInactive'));
-      return;
+      return false;
     }
     if (fresh.email.isNotEmpty && fresh.email != currentUserEmail) {
       _showSnack(tr('shift.notOwner'));
-      return;
+      return false;
     }
 
     final openPausas = await _activePausasForTurno(turnoRef);
     final allPausas = await _allPausasForTurno(turnoRef);
-    final now = getCurrentTimestamp;
 
     final activeSeconds = effectiveShiftSeconds(
       fresh,
       allPausas,
-      referenceNow: now,
+      referenceNow: endTime,
     );
 
     final batch = FirebaseFirestore.instance.batch();
@@ -101,13 +97,13 @@ Future<void> stopTurno(TurnosRecord? turno) async {
     for (final pausa in openPausas) {
       batch.update(
         pausa.reference,
-        createPausasRecordData(fimPausa: now, ativo: false),
+        createPausasRecordData(fimPausa: endTime, ativo: false),
       );
     }
     batch.update(
       turnoRef,
       createTurnosRecordData(
-        fimTurno: now,
+        fimTurno: endTime,
         estado: 'terminado',
         ativo: false,
         duracaoSegundos: activeSeconds,
@@ -117,9 +113,41 @@ Future<void> stopTurno(TurnosRecord? turno) async {
     await _safeShiftNotification(
       () => NotificationsService.instance.cancelShiftAlerts(),
     );
-    _showSnack(tr('shift.stopped'));
+    _showSnack(successMessage);
+    return true;
   } catch (e, st) {
     debugPrint('stopTurno error: $e\n$st');
     _showSnack(tr('shift.stopFailed'));
+    return false;
   }
+}
+
+/// STOP
+/// Parâmetro FlutterFlow: [turno] = Document (Turnos Record), ex. containerTurnosRecord
+Future<void> stopTurno(TurnosRecord? turno) async {
+  if (turno == null) {
+    _showSnack(tr('shift.noActive'));
+    return;
+  }
+  await _finalizeTurno(
+    turno,
+    endTime: getCurrentTimestamp,
+    successMessage: tr('shift.stopped'),
+  );
+}
+
+/// Termina automaticamente turnos activos há mais de 24 horas.
+Future<bool> autoStopTurnoIfExpired(TurnosRecord? turno) async {
+  if (turno == null || !isShiftExpired(turno)) {
+    return false;
+  }
+  final autoEnd = shiftAutoEndTime(turno);
+  if (autoEnd == null) {
+    return false;
+  }
+  return _finalizeTurno(
+    turno,
+    endTime: autoEnd,
+    successMessage: tr('shift.autoStopped24h'),
+  );
 }

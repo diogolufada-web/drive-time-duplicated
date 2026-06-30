@@ -329,7 +329,10 @@ Widget dtAuthScrollBody({
   required List<Widget> children,
   bool centerContent = true,
   bool showFullLogo = true,
+  double logoScale = 1.0,
 }) {
+  final logoMaxWidth = 340.0 * logoScale;
+  final logoMaxHeight = 200.0 * logoScale;
   return LayoutBuilder(
     builder: (context, constraints) {
       final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
@@ -347,8 +350,12 @@ Widget dtAuthScrollBody({
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               if (showFullLogo) ...[
-                dtFullLogo(context),
-                const SizedBox(height: 20.0),
+                dtFullLogo(
+                  context,
+                  maxWidth: logoMaxWidth,
+                  maxHeight: logoMaxHeight,
+                ),
+                SizedBox(height: 20.0 * logoScale),
               ],
               ...children,
             ],

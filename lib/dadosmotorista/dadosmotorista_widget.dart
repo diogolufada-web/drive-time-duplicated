@@ -94,6 +94,7 @@ class _DadosmotoristaWidgetState extends State<DadosmotoristaWidget> {
               top: true,
               child: dtAuthScrollBody(
                 context: context,
+                logoScale: 0.7,
                 children: [
                   dtSectionTitle(
                     context,

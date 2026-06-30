@@ -201,6 +201,10 @@ const Map<String, Map<String, String>> _kTranslations = {
     'pt': 'Turno terminado.',
     'en': 'Shift ended.',
   },
+  'shift.autoStopped24h': {
+    'pt': 'Turno terminado automaticamente após 24 horas.',
+    'en': 'Shift ended automatically after 24 hours.',
+  },
   'shift.stopFailed': {
     'pt': 'Erro ao terminar turno. Tenta novamente.',
     'en': 'Error ending shift. Try again.',

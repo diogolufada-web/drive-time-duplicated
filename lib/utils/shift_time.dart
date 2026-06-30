@@ -1,5 +1,8 @@
 import '/backend/backend.dart';
 
+/// Maximum duration of a single shift before it is auto-terminated.
+const Duration kShiftMaxDuration = Duration(hours: 24);
+
 /// Computes the legally active shift duration in seconds for [turno],
 /// subtracting any pause intervals that fall within the shift window.
 ///
@@ -44,6 +47,25 @@ int effectiveShiftSeconds(
 
   final net = grossSeconds - pauseSeconds;
   return net > 0 ? net : 0;
+}
+
+/// When an active shift must be closed automatically (24h after [inicioTurno]).
+DateTime? shiftAutoEndTime(TurnosRecord turno) {
+  final start = turno.inicioTurno;
+  if (start == null) return null;
+  return start.add(kShiftMaxDuration);
+}
+
+/// True if [turno] is still marked active but has exceeded [kShiftMaxDuration].
+bool isShiftExpired(
+  TurnosRecord turno, {
+  DateTime? referenceNow,
+}) {
+  if (!turno.ativo) return false;
+  final autoEnd = shiftAutoEndTime(turno);
+  if (autoEnd == null) return false;
+  final now = referenceNow ?? DateTime.now();
+  return !now.isBefore(autoEnd);
 }
 
 /// Formats a duration in seconds as `Hh MMm`, e.g. `0h 03m` for 180 seconds.

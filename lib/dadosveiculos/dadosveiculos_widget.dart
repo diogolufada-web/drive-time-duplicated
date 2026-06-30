@@ -132,6 +132,7 @@ class _DadosveiculosWidgetState extends State<DadosveiculosWidget> {
               top: true,
               child: dtAuthScrollBody(
                 context: context,
+                logoScale: 0.7,
                 children: [
                   dtSectionTitle(
                     context,
