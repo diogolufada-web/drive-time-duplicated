@@ -1,0 +1,28 @@
+=== NOTAS PARA O REVISOR APPLE (App Store Connect → App Review Information) ===
+
+A app Drive Time destina-se a motoristas TVDE em Portugal para registo de turnos de trabalho, pausas e exportação de relatórios PDF.
+
+INÍCIO DE SESSÃO
+- A app requer conta. Registo disponível no ecrã "Criar conta".
+- Autenticação: email + palavra-passe (Firebase Auth).
+- Não utilizamos Sign in with Apple na versão actual (apenas email/password).
+
+CONTA DE TESTE PARA REVISÃO (preencher antes de submeter)
+Email: reviewer@drivetimeapp.com
+Password: [CRIAR PASSWORD TEMPORÁRIA ANTES DE SUBMETER E COLOCAR AQUI]
+
+Passos para testar:
+1. Abrir app → Iniciar sessão com credenciais acima (ou criar conta nova)
+2. Preencher dados do motorista e veículo se solicitado (Definições)
+3. Home → Iniciar turno → Pausa → Retomar → Terminar turno
+4. Histórico → ver turnos dos últimos 7 dias
+5. Relatórios → exportar PDF
+
+PERMISSÕES
+- Notificações locais: lembretes de turno (opcional para o utilizador)
+
+DADOS
+- Firestore (Google Firebase, UE). Política: https://drive-time-da85f.web.app/privacy-policy.html
+
+CONTACTO
+admin@drivetimeapp.com

@@ -1,0 +1,58 @@
+=== APP STORE CONNECT — copy/paste (Portugal) ===
+
+NOME DA APP
+Drive Time
+
+SUBTÍTULO (até 30 caracteres)
+Registo de horas TVDE
+
+DESCRIÇÃO CURTA / PROMOTIONAL TEXT (até 170 caracteres)
+Registo de turnos, pausas e relatórios PDF para motoristas TVDE. Horas em tempo real, histórico e exportação.
+
+DESCRIÇÃO COMPLETA
+Drive Time é a aplicação de apoio ao registo de horas de trabalho para motoristas TVDE em Portugal.
+
+FUNCIONALIDADES:
+• Registo de turnos com início, pausa, retoma e fim
+• Contagem de horas efectivas em tempo real
+• Alertas informativos sobre tempo de condução
+• Histórico dos últimos 7 dias
+• Relatórios em PDF
+• Dados de motorista e veículo
+• Interface em português e inglês
+• Modo claro e escuro
+
+A app ajuda-te a organizar os teus registos de forma simples e profissional. Os totais e relatórios são informativos — deves sempre validar os registos e cumprir a legislação aplicável, incluindo os limites da Lei n.º 45/2018.
+
+Suporte: admin@drivetimeapp.com
+
+PALAVRAS-CHAVE (até 100 caracteres, separadas por vírgula)
+TVDE,motorista,turnos,horas,pausas,relatório,PDF,condução,trabalho,Portugal
+
+URL DE SUPORTE
+mailto:admin@drivetimeapp.com
+(ou campo email: admin@drivetimeapp.com)
+
+URL MARKETING (opcional)
+https://drive-time-da85f.web.app/
+
+URL POLÍTICA DE PRIVACIDADE (obrigatório)
+https://drive-time-da85f.web.app/privacy-policy.html
+
+CATEGORIA PRIMÁRIA
+Produtividade
+
+CATEGORIA SECUNDÁRIA (opcional)
+Negócios
+
+CLASSIFICAÇÃO ETÁRIA
+4+ (respostas: sem violência, sem conteúdo adulto, app profissional)
+
+PREÇO
+19,00 EUR (escalão mais próximo na App Store)
+
+COPYRIGHT
+2026 DTerrível
+
+NOTAS DA VERSÃO 1.0.0
+Primeira versão pública. Registo de turnos e pausas, histórico, relatórios PDF, dados de motorista e veículo, modo claro/escuro, PT/EN.

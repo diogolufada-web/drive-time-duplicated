@@ -1,5 +1,7 @@
 # Drive Time — Compilar e publicar para iOS (no Mac)
 
+> **Fast track (app estável, Mac emprestado):** começa por [`IOS_FAST_TRACK.md`](IOS_FAST_TRACK.md) e [`IOS_PACK_LIST.md`](IOS_PACK_LIST.md).
+
 Guia para compilar a app **Drive Time** num Mac (ex.: Mac de um amigo) e enviar para a App Store / TestFlight.
 
 App: **Drive Time** · Bundle ID: **pt.drivetime.app** · Firebase: **drive-time-da85f**
